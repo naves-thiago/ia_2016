@@ -1,5 +1,6 @@
 import sys
 from a_star import *
+from map_loader import No
 
 # Caracteres usados
 floresta = "D"
@@ -39,7 +40,7 @@ def carrega_mapa(arquivo):
         linha = []
         mapa.append(linha)
         for x in range(max_x+1):
-            linha.append(No(x, y, None, custos[mapa_s[y][x]]))
+            linha.append(No(x, y, mapa_s[y][x], custos[mapa_s[y][x]]))
 
             if mapa_s[y][x] == inicio:
                 p_inicio = (x,y)

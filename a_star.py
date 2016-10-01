@@ -1,27 +1,5 @@
 import heapq
-
-# Representa uma posicao para a qual podemos andar no mapa
-class No:
-    # Construtor do objeto no. Sobrescreve as variaveis acima
-    def __init__(self, x, y, anterior=None, custo=0, custo_acumulado=None):
-        self.pos = (x,y)         # Posicao (x,y) no mapa
-        self.anterior = anterior # De onde viemos
-        self.custo = custo
-        self.custo_acumulado = custo_acumulado
-
-    # Retorna uma string que representa esse no.
-    # nesse caso o par (x,y) da posicao
-    def __str__(self):
-        return str(self.pos)
-
-
-    # Permite comparar 2 Nos. (python 3)
-    # Compara os custos (eu sou menor que other?)
-    def __lt__(self, other):
-        if isinstance(other, No):
-            return self.custo < other.custo
-        else:
-            return False
+from map_loader import No
 
 class A_star:
     def _vizinhos(self, no):
@@ -48,12 +26,15 @@ class A_star:
         #return 0
         return abs(b.pos[0] - a.pos[0]) + abs(b.pos[1] - a.pos[1])
 
-    def __init__(self, mapa, pos_ini, pos_fim):
+    def __init__(self, mapa, pos_ini, pos_fim, custoCB=None):
         # Guarda o mapa
         self.mapa = mapa
         self.max_x = len(mapa[0])-1
         self.max_y = len(mapa)-1
         self.pos_fim = pos_fim
+
+        # Callback para obter o custo de um no com custo None
+        self.custoCB = custoCB
 
         # Guarda os nos inicial e final
         self.no_ini = mapa[pos_ini[1]][pos_ini[0]]
@@ -72,6 +53,12 @@ class A_star:
 
         viz = self._vizinhos(atual)
         for v in viz:
+            if v.custo == None:
+                if self.custoCB != None:
+                    v.custo = self.custoCB(v)
+                else:
+                    raise Exception("Falha ao obter o custo para o No "+str(v))
+
             custo = atual.custo_acumulado + v.custo
             if v.custo_acumulado == None or v.custo_acumulado > custo:
                 v.custo_acumulado = custo
