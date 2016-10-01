@@ -39,7 +39,7 @@ def carrega_mapa(arquivo):
         linha = []
         mapa.append(linha)
         for x in range(max_x+1):
-            linha.append(No(x, y, None, False, custos[mapa_s[y][x]]))
+            linha.append(No(x, y, None, custos[mapa_s[y][x]]))
 
             if mapa_s[y][x] == inicio:
                 p_inicio = (x,y)

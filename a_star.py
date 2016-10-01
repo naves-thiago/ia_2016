@@ -2,18 +2,10 @@ import heapq
 
 # Representa uma posicao para a qual podemos andar no mapa
 class No:
-    pos = (-1, -1)   # Posicao (x,y) no mapa
-    anterior = None  # De onde viemos
-    visitado = False # Ja visitamos esse no?
-    custo = 0
-    custo_acumulado = 0
-
     # Construtor do objeto no. Sobrescreve as variaveis acima
-    def __init__(self, x, y, anterior=None, visitado=False, custo=0,
-                custo_acumulado=None):
-        self.pos = (x,y)
-        self.anterior = anterior
-        self.visitado = visitado
+    def __init__(self, x, y, anterior=None, custo=0, custo_acumulado=None):
+        self.pos = (x,y)         # Posicao (x,y) no mapa
+        self.anterior = anterior # De onde viemos
         self.custo = custo
         self.custo_acumulado = custo_acumulado
 
