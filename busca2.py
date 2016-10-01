@@ -23,7 +23,12 @@ mapa_s = None  # Mapa versao string, lido do arquivo
 mapa = []      # Mapa de No
 def carrega_mapa(arquivo):
     global mapa, mapa_s, max_x, max_y, p_inicio, p_fim
-    mf = file(arquivo)
+    # Suporte ao python 2 e 3
+    if sys.version_info[0] < 3:
+        mf = file(arquivo)
+    else:
+        mf = open(arquivo)
+
     mapa_s = mf.readlines()
     mf.close()
     max_x = len(mapa_s[0])-3 # Remove \r\n

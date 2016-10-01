@@ -22,6 +22,15 @@ class No:
     def __str__(self):
         return str(self.pos)
 
+
+    # Permite comparar 2 Nos. (python 3)
+    # Compara os custos (eu sou menor que other?)
+    def __lt__(self, other):
+        if isinstance(other, No):
+            return self.custo < other.custo
+        else:
+            return False
+
 class A_star:
     def _vizinhos(self, no):
         ''' Retorna a lista de vizinhos do no '''
