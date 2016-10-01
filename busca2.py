@@ -30,10 +30,10 @@ def carrega_mapa(arquivo):
     max_y = len(mapa_s)-1
 
     # Cria nos para as posicoes livres do mapa
-    for x in range(max_x+1):
+    for y in range(max_y+1):
         linha = []
         mapa.append(linha)
-        for y in range(max_y+1):
+        for x in range(max_x+1):
             linha.append(No(x, y, None, False, custos[mapa_s[y][x]]))
 
             if mapa_s[y][x] == inicio:
@@ -58,6 +58,24 @@ def print_mapa():
         sys.stdout.write(l)  # o mesmo que print, mas sem quebra de linha
     print("")
 
+def print_solucao(sol):
+    # Converte o mapa de string para vetor de char/strings
+    mapa2 = []
+    for l in mapa_s:
+        mapa2.append([x for x in l])
+
+    # Altera o novo mapa para marcar o caminho
+    for n in sol:
+        mapa2[n.pos[1]][n.pos[0]] = caminho
+
+    # Converte de volta pra string para imprimir com a mesma cara
+    for l in mapa2:
+        tmp = ""
+        for c in l:
+            tmp += c
+        sys.stdout.write(tmp)
+
+    print("")
 
 ##### MAIN ######
 carrega_mapa("mapa_trabalho.txt")
@@ -70,6 +88,16 @@ while a.step() != None:
     continue
 
 sol = solucao(a.no_fim)
+print_solucao(sol)
+
+'''
+for i in range(5):
+    fim, viz = a.step()
+    print(fim)
+    print(str(fim)+" - "+str([str(x) for x in viz]))
+sol = solucao(fim)
+print_solucao(sol)
+'''
 
 '''
 sol = bfs(p_inicio, p_fim)
@@ -77,18 +105,4 @@ print_mapa()
 print("-------------------------------------\n")
 
 '''
-# Converte o mapa de string para vetor de char/strings
-mapa2 = []
-for l in mapa_s:
-    mapa2.append([x for x in l])
 
-# Altera o novo mapa para marcar o caminho
-for n in sol:
-    mapa2[n.pos[1]][n.pos[0]] = caminho
-
-# Converte de volta pra string para imprimir com a mesma cara
-for l in mapa2:
-    tmp = ""
-    for c in l:
-        tmp += c
-    sys.stdout.write(tmp)

@@ -44,8 +44,8 @@ class A_star:
     def _distancia(self, a, b):
         ''' Calcula a distancia manhattan entre a e b.
         a e b sao nos '''
-        return 0
-        #return abs(b.pos[0] - a.pos[0]) + abs(b.pos[1] - a.pos[1])
+        #return 0
+        return abs(b.pos[0] - a.pos[0]) + abs(b.pos[1] - a.pos[1])
 
     def __init__(self, mapa, pos_ini, pos_fim):
         # Guarda o mapa
