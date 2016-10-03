@@ -14,7 +14,7 @@ parent2 = None;
 class Ind:
     def __init__(self):
         self.values = [[0 for j in range(len(candyAp))] for i in range(len(glade))]
-        self.cost = 0
+        self.totalCost = 0
     
     def rand(self):
         candy = [5]*len(candyAp)
@@ -53,25 +53,20 @@ class Ind:
         return fit
 
     def calcFit(self):
+        self.costs = []
+        
         for i in range (0, len(glade)):
-            self.cost += self.lineCost(i)
-            self.fitness = 1000 - self.cost
+            line = self.lineCost(i)
+            self.totalCost += line
+            self.costs.append(line)
+        
+        self.fitness = 1000 - self.totalCost
+        return self.costs
         
 def initPop():
     while (len(population) < numPop):
         ind = Ind()
         ind.rand()
-        if (len(population) == 0):
-            """ind.values[0] = [1, 0, 1, 1, 0]
-            ind.values[1] = [1, 1, 0, 1, 0]
-            ind.values[2] = [1, 1, 0, 1, 0]
-            ind.values[3] = [0, 0, 1, 0, 1]
-            ind.values[4] = [1, 1, 0, 1, 0]
-            ind.values[5] = [0, 0, 1, 0, 1]
-            ind.values[6] = [0, 1, 0, 0, 1]
-            ind.values[7] = [0, 0, 1, 0, 1]
-            ind.values[8] = [0, 0, 1, 1, 0]
-            ind.values[9] = [0, 1, 0, 0, 1]"""
         if (ind.validate()):
             ind.calcFit()
             population.append(ind)
@@ -118,10 +113,7 @@ def crossOver(a, b):
     return (f1, f2)
 
 def mutate(g, ind):
-    """inRate = 3*g*g/(maxGen*maxGen) - 3*g/maxGen + 0.8
     
-    if (g - bestGen > 50):
-        inRate += 0.145"""
     rand = uniform(0, 1)    
     
     if (rand < mRate):
@@ -156,7 +148,7 @@ def newGeneration(g):
         if (f1.validate() and f2.validate()):
             f1.calcFit()
             f2.calcFit()
-            if (f1.cost >= f2.cost):
+            if (f1.totalCost >= f2.totalCost):
                 if (f1.values not in [ind.values for ind in population]):
                     population.append(f1)
             else:
@@ -195,13 +187,10 @@ def evolution():
         
         mRate = 3*g*g/(maxGen*maxGen) - 3*g/maxGen + 0.8
 
-        if (g - bestGen > 50):
+        if (g - bestGen > 20):
             mRate *= 1+uniform(0,1)
-        #population.sort(key = lambda ind: ind.fitness)
-        
-        #print("population")
-        #for j in range (0, len(population)-1):
-        #    print(population[i].fitness)
+            if mRate > 1:
+                mRate -= (mRate - 1) + 0.05 
         
         bestGenFit = population[len(population) - 1].fitness
         
@@ -210,16 +199,13 @@ def evolution():
             best = population[len(population) - 1]
             bestGen = g
         
-        print("Best after %d => %.2f  BestGen = %d  mRate = %.2f" % (g, best.cost, bestGen, mRate))
+        print("Best after %d => %.2f  BestGen = %d  mRate = %.2f" % (g, best.totalCost, bestGen, mRate))
     
-    print("best cost = %f" % population[len(population) - 1].cost)
-    print("worst cost = %f" % population[0].cost)
+    print("best totalCost = %f" % population[len(population) - 1].totalCost)
+    print("worst totalCost = %f" % population[0].totalCost)
     
-    #for i in range (0, len(population)):
-    #    print("population[%d].cost = %f" % (i, population[i].cost))
-    
-    print("Best after %d => %.2f" % (g, best.cost))
-    log.write("\nBest after %d => %.2f\n" % (g, best.cost))
+    print("Best after %d => %.2f" % (g, best.totalCost))
+    log.write("\nBest after %d => %.2f\n" % (g, best.totalCost))
     for i in range (0, len(glade)):
         print(best.values[i])
         log.write(str(best.values[i]))
