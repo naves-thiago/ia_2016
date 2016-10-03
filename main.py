@@ -52,41 +52,55 @@ sol_index = 0
 map_state = MapState.STEPS
 old_pos = None
 old_color = None
+
+def update_map_steps():
+    global steps, steps_index, old_pos, old_color, mapa_cor
+    if steps_index < len(steps):
+        if steps[steps_index]: # Make sure this is not None
+            v, c = steps[steps_index] # Visited, candidates
+
+            # Paint the last tested position as a candidate
+            if old_pos:
+                mapa_cor[old_pos[1]][old_pos[0]] = mix_color(old_color, cores[candidato])
+
+            old_pos = v.pos
+            old_color = mapa_cor[v.pos[1]][v.pos[0]]
+
+            mapa_cor[v.pos[1]][v.pos[0]] = mix_color(old_color, cores[testado])
+            for ci in c:
+                mc = mapa_cor[ci.pos[1]][ci.pos[0]]
+                mapa_cor[ci.pos[1]][ci.pos[0]] = mix_color(mc, cores[candidato])
+
+            steps_index += 1
+        else:
+            return True
+    else:
+        return True
+
+    return False
+
+
+def update_map_solution():
+    global sol, sol_index, mapa_cor
+    if sol_index < len(sol):
+        n = sol[sol_index]
+        mapa_cor[n.pos[1]][n.pos[0]] = cores[solucao]
+        sol_index += 1
+    else:
+        return True
+
+    return False
+
 def get_map():
-    global steps, steps_index, sol, sol_index, map_state, mapa_cor
-    global old_pos, old_color
+    global map_state, mapa_cor
 
     if map_state == MapState.SOLUTION:
-        if sol_index < len(sol):
-            n = sol[sol_index]
-            mapa_cor[n.pos[1]][n.pos[0]] = cores[solucao]
-            sol_index += 1
-        else:
+        if update_map_solution():
             map_state = MapState.DONE
 
     elif map_state == MapState.STEPS:
-        if steps_index < len(steps):
-            if steps[steps_index]: # Make sure this is not None
-                v, c = steps[steps_index] # Visited, candidates
-
-                # Paint the last tested position as a candidate
-                if old_pos:
-                    mapa_cor[old_pos[1]][old_pos[0]] = mix_color(old_color, cores[candidato])
-
-                old_pos = v.pos
-                old_color = mapa_cor[v.pos[1]][v.pos[0]]
-
-                mapa_cor[v.pos[1]][v.pos[0]] = mix_color(old_color, cores[testado])
-                for ci in c:
-                    mc = mapa_cor[ci.pos[1]][ci.pos[0]]
-                    mapa_cor[ci.pos[1]][ci.pos[0]] = mix_color(mc, cores[candidato])
-
-                steps_index += 1
-            else:
-                map_state = MapState.SOLUTION
-        else:
+        if update_map_steps():
             map_state = MapState.SOLUTION
-
 
     return mapa_cor
 
