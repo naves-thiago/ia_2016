@@ -1,16 +1,18 @@
-from random import randint
+from random import randint, uniform
+from math import floor
 
-numPop = 100;
-population = [];
-best = -1;
-bestIndex = -1;
 candyAp = [1.1, 1.2, 1.3, 1.4, 1.5];
 glade = [150, 140, 130, 120, 110, 100, 95, 90, 85, 80];
+numPop = 500;
+maxGen = 100;
+population = [];
+parent1 = None;
+parent2 = None;
 
 class Ind:
     def __init__(self):
         self.values = [[0 for j in range(len(candyAp))] for i in range(len(glade))]
-        self.fitness = 0
+        self.cost = 0
         candy = [5]*len(candyAp)
         rand = 0
         for i in range(0, len(glade)):
@@ -38,45 +40,175 @@ class Ind:
                 return False
         return True
         
-    def lineFit(self, line):
+    def lineCost(self, line):
         fit = 0;
         ap = 0;
         for i in range (0, len(candyAp)):
             ap += candyAp[i] * self.values[line][i]
         fit = glade[line]/ap
-        #print ("linefit = %.2f" % fit)
+        #print ("lineCost = %.2f" % fit)
         return fit
 
-    def totalFit(self):
+    def calcFit(self):
         for i in range (0, len(glade)):
-            self.fitness += self.lineFit(i)
+            self.cost += self.lineCost(i)
+            self.fitness = 1000 - self.cost
         
 def initPop():
-    global best
-    global bestIndex
-    global population
-    ind = Ind()
-    while (ind.validate() == False):
-        ind = Ind()
-    ind.totalFit()
-    best = ind.fitness
-    bestIndex = 0
-    population.append(ind)
     while (len(population) < numPop):
         ind = Ind()
         if (ind.validate()):
-            ind.totalFit()
+            ind.calcFit()
             population.append(ind)
-            if (ind.fitness < best):
-                best = ind.fitness
-                bestIndex = len(population)-1
-            
-def main():
-    global bestIndex
-    global population
-    initPop()
+
+def selectInd(group):
+    ind = None
+    totalFit = sum(ind.fitness for ind in group)
+    weights = []
     
-    print(len(population))
-    print("final bestIndex = %d" % bestIndex)
-    print("best = %.2f" % best)
+    #print("total = %.2f" % totalFit)
+
+    for i in range (0, len(group)):
+        #print("group[%d].fitness = %.2f" % (i, group[i].fitness))
+        #print("weight desse cara = %f" % (group[i].fitness/totalFit))
+        weights.append(group[i].fitness/totalFit)
+    
+    rand = uniform(0, 1)
+    
+    #print("weights")
+    #print(weights)
+    
+    i = 0
+    sumOfWeights = weights[i]
+    while (rand > sumOfWeights):
+        i += 1
+        sumOfWeights += weights[i]
+    ind = group[i]
+
+    #print("i = %d" % i)
+
+    return (ind)
+        
+def crossOver(a, b):
+    f1 = Ind()
+    f2 = Ind()
+    corte = randint(1, len(candyAp)*len(glade)-1)
+    corteX = corte % len(candyAp)
+    corteY = floor(corte / len(candyAp))
+    for y in range(len(glade)):
+        if y <= corteY:
+            f1.values[y] = [vy for vy in a.values[y]]
+            f2.values[y] = [vy for vy in b.values[y]]
+        else:
+            f1.values[y] = [vy for vy in b.values[y]]
+            f2.values[y] = [vy for vy in a.values[y]]
+    for x in range(len(candyAp)):
+        if x < corteX:
+            f1.values[corteY][x] = a.values[corteY][x]
+            f2.values[corteY][x] = b.values[corteY][x]
+        else:
+            f1.values[corteY][x] = b.values[corteY][x]
+            f2.values[corteY][x] = a.values[corteY][x]
+    return (f1, f2)
+
+def mutate(g, ind):
+    mRate = 3*g*g/(maxGen*maxGen) - 3*g/maxGen + 0.8
+    print("g = %d" % g)
+    print("mRate = %f" % mRate)
+    rand = uniform(0, 1)    
+    
+    if (rand < mRate):
+        for i in range(0, len(glade)):
+            for j in range (0, len(candyAp)):
+                rand = uniform(0, 1)
+                if (rand < mRate):
+                    if (ind.values[i][j] == 1):
+                        ind.values[i][j] = 0
+                    else:
+                        ind.values[i][j] = 1
+
+    return ind
+    
+def newGeneration(g):
+    global population
+    newGen = []
+    p1 = None
+    p2 = None
+    f1 = None
+    f2 = None
+    
+    while (len(population) < 3*numPop/2):
+        p1 = selectInd(population)
+        p2 = selectInd(population)
+        (f1, f2) = crossOver(p1, p2)
+        
+        f1 = mutate(g, f1)
+        f2 = mutate(g, f2)
+        
+        if (f1.validate() and f2.validate()):
+            f1.calcFit()
+            f2.calcFit()
+            if (f1.cost >= f2.cost):
+                if (f1 not in population):
+                    population.append(f1)
+            else:
+                if (f2 not in population):
+                    population.append(f2)
+        else:
+            if (f1.validate()):
+                f1.calcFit()
+                if (f1 not in population):
+                    population.append(f1)
+            if (f2.validate()):
+                f2.calcFit()
+                if (f2 not in population):
+                    population.append(f2)
+                
+        population.sort(key = lambda ind: ind.fitness)
+
+        
+    for i in range (0, numPop):
+        newGen.append(population[len(population) - 1 - i])
+        
+    population = newGen
+    population.sort(key = lambda ind: ind.fitness)
+    
+def main():
+    bestFit = 0
+    best = None
+    log = open('log.txt', 'a')
+    
+    initPop()
+
+    for j in range (0, maxGen):
+        newGeneration(j)
+        #population.sort(key = lambda ind: ind.fitness)
+        
+        #print("population")
+        #for j in range (0, len(population)-1):
+        #    print(population[i].fitness)
+        
+        bestGenFit = population[len(population) - 1].fitness
+        
+        if (bestFit < bestGenFit):
+            bestFit = bestGenFit
+            best = population[len(population) - 1]
+        
+        #print("Best after %d => %.2f" % (j, best.cost))
+    
+    print("best cost = %.2f" % population[len(population) - 1].cost)
+    print("worst cost = %.2f" % population[0].cost)
+    
+    for i in range (0, len(population)):
+        print("population[%d].cost = %f" % (i, population[i].cost))
+    
+    print("Best after %d => %.2f" % (j, best.cost))
+    log.write("\nBest after %d => %.2f\n" % (j, best.cost))
+    for i in range (0, len(glade)):
+        print(best.values[i])
+        log.write(str(best.values[i]))
+        log.write('\n')
+    log.write('\n')
+    
+    log.close
 main()
