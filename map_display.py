@@ -28,17 +28,25 @@ def _desenhaMapa(screen, mapa):
         for x in range(len(mapa[y])):
             pygame.draw.rect(screen, mapa[y][x], pygame.Rect(x*sz_x, y*sz_y, sz_x, sz_y))
 
-def mostraMapa(mapa):
+def mostraMapa(get_map_cb):
     pygame.init()
+    mapa = get_map_cb()
     tamanho_tela = (tamanho_sprite[0]*len(mapa[0]), tamanho_sprite[1]*len(mapa))
     screen = pygame.display.set_mode(tamanho_tela,0,32)
     clock = pygame.time.Clock()
 
+    i=1
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+        #if i == 0:
+        mapa = get_map_cb()
+
+        i += 1
+        i %= 3
 
         _desenhaMapa(screen, mapa)
         pygame.display.flip()
