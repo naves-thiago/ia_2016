@@ -1,15 +1,15 @@
 from random import randint, uniform
 from math import floor
 
-candyAp = [1.1, 1.2, 1.3, 1.4, 1.5];
-glade = [150, 140, 130, 120, 110, 100, 95, 90, 85, 80];
-numPop = 100;
-maxGen = 500;
+candyAp = [1.1, 1.2, 1.3, 1.4, 1.5]
+glade = [150, 140, 130, 120, 110, 100, 95, 90, 85, 80]
+numPop = 100
+maxGen = 5
 bestGen = 0
 mRate = 0
-population = [];
-parent1 = None;
-parent2 = None;
+population = []
+parent1 = None
+parent2 = None
 
 class Ind:
     def __init__(self):
@@ -148,7 +148,8 @@ def newGeneration(g):
         if (f1.validate() and f2.validate()):
             f1.calcFit()
             f2.calcFit()
-            if (f1.totalCost >= f2.totalCost):
+            #if (f1.totalCost >= f2.totalCost):
+            if (f1.totalCost < f2.totalCost):
                 if (f1.values not in [ind.values for ind in population]):
                     population.append(f1)
             else:
@@ -215,7 +216,20 @@ def evolution():
     log.close
     return best
 
-def main():
-    evolution()
+'''def main():
+    ind = Ind()
+	
+    ind.values[0] = [1, 1, 0, 1, 0]
+    ind.values[1] = [1, 1, 1, 0, 0]
+    ind.values[2] = [1, 1, 1, 0, 0]
+    ind.values[3] = [1, 1, 1, 0, 0]
+    ind.values[4] = [0, 0, 0, 1, 1]
+    ind.values[5] = [0, 0, 0, 1, 1]
+    ind.values[6] = [0, 0, 0, 1, 1]
+    ind.values[7] = [0, 0, 1, 0, 1]
+    ind.values[8] = [0, 1, 0, 0, 1]
+    ind.values[9] = [0, 0, 1, 1, 0]
+
+    print(ind.calcFit())
     
-main()
+main()'''
