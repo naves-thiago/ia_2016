@@ -1,6 +1,7 @@
 from a_star import *
 from map_loader import *
 from map_display import *
+from evolution import evolution
 
 # Caracteres usados
 floresta  = "D"
@@ -16,10 +17,26 @@ testado   = "T"
 # Core de cada tipo de caminho / No
 cores = {floresta:(0, 155, 0), galho:(140, 95, 0), vazio:(252, 217, 141), inicio:(252, 217, 141), fim:(252, 217, 141), lobo:(252, 252, 0), solucao:(220, 0, 0), candidato:(158, 195, 255), testado:(142, 0, 150)}
 
+custo_lobo = [38.46153846153846,
+              37.83783783783784,
+              36.111111111111114,
+              33.333333333333336,
+              37.93103448275862,
+              34.48275862068966,
+              33.92857142857143,
+              33.33333333333333,
+              31.48148148148148,
+              30.769230769230774]
+lobo_index = 0
+
 def custoCB(no):
     ''' Callback chamada pelo A* para obter o custo de um No
     com custo desconhecido (o lobo) '''
-    return 0 # Ainda nao temos os custos. Por agora retorna 0
+
+    global custo_lobo, lobo_index
+    custo = custo_lobo[lobo_index]
+    lobo_index += 1
+    return custo
 
 def gera_solucao(no):
     res = []
@@ -66,7 +83,7 @@ def update_map_steps():
             old_pos = v.pos
             old_color = mapa_cor[v.pos[1]][v.pos[0]]
 
-            mapa_cor[v.pos[1]][v.pos[0]] = mix_color(old_color, cores[testado])
+            mapa_cor[v.pos[1]][v.pos[0]] = cores[testado]
             for ci in c:
                 mc = mapa_cor[ci.pos[1]][ci.pos[0]]
                 mapa_cor[ci.pos[1]][ci.pos[0]] = mix_color(mc, cores[candidato])
@@ -105,10 +122,12 @@ def get_map():
     return mapa_cor
 
 def main():
-    global mapa_cor, steps, sol
+    global mapa_cor, steps, sol, custo_lobo
     mapLoader = MapLoader("mapa_trabalho.txt")
     print("Inicio: "+str(mapLoader.p_inicio))
     print("Fim: "+str(mapLoader.p_fim))
+   # custo_lobo = evolution().costs # RODAR GA NA HORA
+    print(custo_lobo)
     mapa = mapLoader.mapa
     busca = A_star(mapa, mapLoader.p_inicio, mapLoader.p_fim, custoCB)
 
