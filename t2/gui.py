@@ -3,7 +3,8 @@ import sys
 
 # Configs ##############
 
-sprite_size = (47, 47)
+#sprite_size = (47, 47)
+sprite_size = (60, 60)
 FPS = 24
 
 ########################
@@ -38,10 +39,27 @@ class Sprite:
 pygame.init()
 s = pygame.display.set_mode((640, 480))
 
-k = Sprite("kenny.png", pygame.Rect(0, 94, 47, 47))
+# Load actor sprites
+sprite_up     = Sprite("kenny.png", pygame.Rect(0, 0,   47, 47))
+sprite_right  = Sprite("kenny.png", pygame.Rect(0, 47,  47, 47))
+sprite_down   = Sprite("kenny.png", pygame.Rect(0, 94,  47, 47))
+sprite_left   = Sprite("kenny.png", pygame.Rect(0, 141, 47, 47))
+
+sprite_hole   = Sprite("hole.png")
+sprite_enemy1 = Sprite("satan.png")
+sprite_enemy2 = Sprite("saddam-hussein.png")
+
+# Test code
 s.fill((0, 100, 20))
-k.draw(s, (10, 10))
+sprite_up.draw(s, (10, 10))
+sprite_right.draw(s, (80, 10))
+sprite_down.draw(s, (150, 10))
+sprite_left.draw(s, (230, 10))
+sprite_hole.draw(s, (300, 10))
+sprite_enemy1.draw(s, (10, 80))
+sprite_enemy2.draw(s, (10, 150))
 pygame.display.flip()
+#####
 
 while True:
     for event in pygame.event.get():
