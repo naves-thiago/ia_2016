@@ -9,13 +9,10 @@ FPS = 24
 
 ########################
 
-# Sprites
 class Sprite:
-    def __init__(self, img_file, rect=None):
-        ''' Load an image file as an sprite. Optionally use only the area defined in rect. '''
+    def __init__(self, img_file, rect=None, scale=(1,1)):
+        ''' Load an image file as an sprite. Optionally use only the area defined in rect and change scale. '''
         f_img = pygame.image.load(img_file)
-        self.img = pygame.Surface(sprite_size, pygame.SRCALPHA, 32)
-        self.img.convert_alpha()
 
         if rect != None:
             # Extract the part of the image defined by rect
@@ -26,10 +23,13 @@ class Sprite:
             tmp = f_img
 
         # Scale the image if needed
-        if tmp.get_rect().size == sprite_size:
+        if tmp.get_rect().size == sprite_size and scale == (1,1):
             self.img = tmp
         else:
-            self.img = pygame.transform.smoothscale(tmp, sprite_size)
+            size = (round(sprite_size[0] * scale[0]), round(sprite_size[1] * scale[1]))
+            pos  = (round((sprite_size[0] - size[0]) / 2), round((sprite_size[1] - size[1]) / 2))
+            self.img = pygame.Surface(sprite_size, pygame.SRCALPHA, 32)
+            self.img.blit(pygame.transform.smoothscale(tmp, size), pos)
 
     def draw(self, surface, pos):
         ''' Draw self on the surface at position pos (x,y) '''
@@ -40,12 +40,12 @@ pygame.init()
 s = pygame.display.set_mode((640, 480))
 
 # Load actor sprites
-sprite_up     = Sprite("kenny.png", pygame.Rect(0, 0,   47, 47))
-sprite_right  = Sprite("kenny.png", pygame.Rect(0, 47,  47, 47))
-sprite_down   = Sprite("kenny.png", pygame.Rect(0, 94,  47, 47))
-sprite_left   = Sprite("kenny.png", pygame.Rect(0, 141, 47, 47))
+sprite_up     = Sprite("kenny.png", pygame.Rect(0, 0,   47, 47), (0.7, 0.7))
+sprite_right  = Sprite("kenny.png", pygame.Rect(0, 47,  47, 47), (0.7, 0.7))
+sprite_down   = Sprite("kenny.png", pygame.Rect(0, 94,  47, 47), (0.7, 0.7))
+sprite_left   = Sprite("kenny.png", pygame.Rect(0, 141, 47, 47), (0.7, 0.7))
 
-sprite_hole   = Sprite("hole.png")
+sprite_hole   = Sprite("hole.png", None, (0.7, 0.7))
 sprite_enemy1 = Sprite("satan.png")
 sprite_enemy2 = Sprite("saddam-hussein.png")
 
