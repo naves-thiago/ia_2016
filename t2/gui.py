@@ -48,6 +48,7 @@ sprite_left   = Sprite("kenny.png", pygame.Rect(0, 141, 47, 47), (0.7, 0.7))
 sprite_hole   = Sprite("hole.png", None, (0.7, 0.7))
 sprite_enemy1 = Sprite("satan.png")
 sprite_enemy2 = Sprite("saddam-hussein.png")
+sprite_gold   = Sprite("coins_1.png", None, (0.6, 0.6))
 
 # Test code
 s.fill((0, 100, 20))
@@ -57,7 +58,8 @@ sprite_down.draw(s, (150, 10))
 sprite_left.draw(s, (230, 10))
 sprite_hole.draw(s, (300, 10))
 sprite_enemy1.draw(s, (10, 80))
-sprite_enemy2.draw(s, (10, 150))
+sprite_enemy2.draw(s, (80, 80))
+sprite_gold.draw(s, (150, 80))
 pygame.display.flip()
 #####
 
