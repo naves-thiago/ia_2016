@@ -1,10 +1,11 @@
 import pygame
 import sys
+from map_loader import *
 
 # Configs ##############
 
 #sprite_size = (47, 47)
-sprite_size = (60, 60)
+sprite_size = (50, 50)
 FPS = 24
 
 ########################
@@ -35,31 +36,48 @@ class Sprite:
         ''' Draw self on the surface at position pos (x,y) '''
         surface.blit(self.img, pos)
 
+# Surface, Map
+def draw_map(s, m):
+    s.fill((0, 100, 20))
+    for y in range(len(m)):
+        for x in range(len(m[0])):
+            if sprites.get(m[y][x].tipo):
+                sprites[m[y][x].tipo].draw(s, (x * sprite_size[0], y * sprite_size[1]));
+
 
 pygame.init()
-s = pygame.display.set_mode((640, 480))
+s = pygame.display.set_mode((12 * sprite_size[0], 12 * sprite_size[1]))
 
 # Load actor sprites
-sprite_up     = Sprite("kenny.png", pygame.Rect(0, 0,   47, 47), (0.7, 0.7))
-sprite_right  = Sprite("kenny.png", pygame.Rect(0, 47,  47, 47), (0.7, 0.7))
-sprite_down   = Sprite("kenny.png", pygame.Rect(0, 94,  47, 47), (0.7, 0.7))
-sprite_left   = Sprite("kenny.png", pygame.Rect(0, 141, 47, 47), (0.7, 0.7))
+sprite_up     = Sprite("imagens/kenny.png", pygame.Rect(0, 0,   47, 47), (0.7, 0.7))
+sprite_right  = Sprite("imagens/kenny.png", pygame.Rect(0, 47,  47, 47), (0.7, 0.7))
+sprite_down   = Sprite("imagens/kenny.png", pygame.Rect(0, 94,  47, 47), (0.7, 0.7))
+sprite_left   = Sprite("imagens/kenny.png", pygame.Rect(0, 141, 47, 47), (0.7, 0.7))
 
-sprite_hole   = Sprite("hole.png", None, (0.7, 0.7))
-sprite_enemy1 = Sprite("satan.png")
-sprite_enemy2 = Sprite("saddam-hussein.png")
-sprite_gold   = Sprite("coins_1.png", None, (0.6, 0.6))
+sprite_hole   = Sprite("imagens/hole.png", None, (0.7, 0.7))
+sprite_enemy1 = Sprite("imagens/satan.png")
+sprite_enemy2 = Sprite("imagens/saddam-hussein.png")
+sprite_gold   = Sprite("imagens/coins_1.png", None, (0.6, 0.6))
+
+# falta powerup e teleport
+
+#sprites = {"D":sprite_enemy1, "d":sprite_enemy2,   "U":sprite_powerup,
+#           "P":sprite_hole,   "T":sprite_teleport, "O":sprite_gold}
+sprites = {"D":sprite_enemy1, "d":sprite_enemy2, "P":sprite_hole, "O":sprite_gold}
 
 # Test code
-s.fill((0, 100, 20))
-sprite_up.draw(s, (10, 10))
-sprite_right.draw(s, (80, 10))
-sprite_down.draw(s, (150, 10))
-sprite_left.draw(s, (230, 10))
-sprite_hole.draw(s, (300, 10))
-sprite_enemy1.draw(s, (10, 80))
-sprite_enemy2.draw(s, (80, 80))
-sprite_gold.draw(s, (150, 80))
+ml   = MapLoader("mapa.txt")
+mapa = ml.mapa
+draw_map(s, mapa)
+# s.fill((0, 100, 20))
+# sprite_up.draw(s, (10, 10))
+# sprite_right.draw(s, (80, 10))
+# sprite_down.draw(s, (150, 10))
+# sprite_left.draw(s, (230, 10))
+# sprite_hole.draw(s, (300, 10))
+# sprite_enemy1.draw(s, (10, 80))
+# sprite_enemy2.draw(s, (80, 80))
+# sprite_gold.draw(s, (150, 80))
 pygame.display.flip()
 #####
 
