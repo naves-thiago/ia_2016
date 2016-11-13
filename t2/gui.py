@@ -49,21 +49,22 @@ pygame.init()
 s = pygame.display.set_mode((12 * sprite_size[0], 12 * sprite_size[1]))
 
 # Load actor sprites
-sprite_up     = Sprite("imagens/kenny.png", pygame.Rect(0, 0,   47, 47), (0.7, 0.7))
-sprite_right  = Sprite("imagens/kenny.png", pygame.Rect(0, 47,  47, 47), (0.7, 0.7))
-sprite_down   = Sprite("imagens/kenny.png", pygame.Rect(0, 94,  47, 47), (0.7, 0.7))
-sprite_left   = Sprite("imagens/kenny.png", pygame.Rect(0, 141, 47, 47), (0.7, 0.7))
+sprite_up      = Sprite("imagens/kenny.png", pygame.Rect(0, 0,   47, 47), (0.7, 0.7))
+sprite_right   = Sprite("imagens/kenny.png", pygame.Rect(0, 47,  47, 47), (0.7, 0.7))
+sprite_down    = Sprite("imagens/kenny.png", pygame.Rect(0, 94,  47, 47), (0.7, 0.7))
+sprite_left    = Sprite("imagens/kenny.png", pygame.Rect(0, 141, 47, 47), (0.7, 0.7))
 
-sprite_hole   = Sprite("imagens/hole.png", None, (0.7, 0.7))
-sprite_enemy1 = Sprite("imagens/satan.png")
-sprite_enemy2 = Sprite("imagens/saddam-hussein.png")
-sprite_gold   = Sprite("imagens/coins_1.png", None, (0.6, 0.6))
+sprite_hole    = Sprite("imagens/hole.png", None, (0.7, 0.7))
+sprite_enemy1  = Sprite("imagens/satan.png")
+sprite_enemy2  = Sprite("imagens/saddam-hussein.png")
+sprite_gold    = Sprite("imagens/coins_1.png", None, (0.6, 0.6))
+sprite_powerup = Sprite("imagens/chinpokomon.png", None, (0.6, 0.6))
 
 # falta powerup e teleport
 
 #sprites = {"D":sprite_enemy1, "d":sprite_enemy2,   "U":sprite_powerup,
 #           "P":sprite_hole,   "T":sprite_teleport, "O":sprite_gold}
-sprites = {"D":sprite_enemy1, "d":sprite_enemy2, "P":sprite_hole, "O":sprite_gold}
+sprites = {"D":sprite_enemy1, "d":sprite_enemy2, "P":sprite_hole, "O":sprite_gold, "U":sprite_powerup}
 
 # Test code
 ml   = MapLoader("mapa.txt")
