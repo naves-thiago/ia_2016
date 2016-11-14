@@ -1,0 +1,31 @@
+:-dynamic([
+	inimigoD/2,
+	inimigod/2,
+	powerup/1,
+	buraco/1,
+	teleport/1,
+	ouro/1,
+]).
+
+powerup(p(1,12))
+buraco(p(2,11))
+teleport(p(4,11))
+ouro(p(9,11))
+buraco(p(10,10))
+inimigod(p(2,9),100)
+buraco(p(7,9))
+buraco(p(4,8))
+inimigoD(p(11,8),100)
+teleport(p(1,7))
+powerup(p(7,7))
+inimigoD(p(5,6),100)
+buraco(p(10,6))
+ouro(p(3,5))
+buraco(p(3,3))
+teleport(p(7,3))
+buraco(p(11,3))
+powerup(p(2,2))
+buraco(p(5,2))
+inimigod(p(10,2),100)
+ouro(p(11,2))
+teleport(p(10,1))

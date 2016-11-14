@@ -1,3 +1,5 @@
 *.pyc
 __py_cache__/*
 *.vim
+*.iml
+*.xml

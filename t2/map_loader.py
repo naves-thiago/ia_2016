@@ -34,8 +34,10 @@ class MapLoader:
         # Suporte ao python 2 e 3
         if sys.version_info[0] < 3:
             mf = file(arquivo)
+            pl_map = file("mapa.pl", 'w')
         else:
             mf = open(arquivo)
+            pl_map = open("mapa.pl", 'w')
 
         mapa_s = mf.readlines()
         mf.close()
@@ -46,11 +48,41 @@ class MapLoader:
 
         self.max_y = len(mapa_s)-1
 
+        pl_map.write(":-dynamic([\n")
+        pl_map.write("\tinimigoD/2,\n")
+        pl_map.write("\tinimigod/2,\n")
+        pl_map.write("\tpowerup/1,\n")
+        pl_map.write("\tburaco/1,\n")
+        pl_map.write("\tteleport/1,\n")
+        pl_map.write("\touro/1,\n")
+        pl_map.write("]).\n\n")
+
         # Cria nos para as posicoes livres do mapa
         for y in range(self.max_y+1):
             linha = []
             self.mapa.append(linha)
             for x in range(self.max_x+1):
-                linha.append(No(x, y, mapa_s[y][x]))
+                linha.append(No(x+1, 12-y, mapa_s[y][x]))
+                # sprites = {'D':sprite_enemy1, 'd':sprite_enemy2,   'U':sprite_powerup,
+                #           'P':sprite_hole,   'T':sprite_teleport, 'O':sprite_gold}
+                if (mapa_s[y][x]=='D'):
+                    print 'inimigoD(p(',x+1,',',y+1,'),100)'
+                    pl_map.write('inimigoD(p(%d,%d),100)\n' %(x+1, 12-y))
+                elif (mapa_s[y][x]=='d'):
+                    print 'inimigod(p(%d,%d),100)' %(x+1, 12-y)
+                    pl_map.write('inimigod(p(%d,%d),100)\n' %(x+1, 12-y))
+                elif (mapa_s[y][x]=='U'):
+                    print 'powerup(p(%d,%d))' %(x+1, 12-y)
+                    pl_map.write('powerup(p(%d,%d))\n' %(x+1, 12-y))
+                elif (mapa_s[y][x]=='P'):
+                    print 'buraco(p(%d,%d))' %(x+1, 12-y)
+                    pl_map.write('buraco(p(%d,%d))\n' %(x+1, 12-y))
+                elif (mapa_s[y][x]=='T'):
+                    print 'teleport(p(%d,%d))' %(x+1, 12-y)
+                    pl_map.write('teleport(p(%d,%d))\n' %(x+1, 12-y))
+                elif (mapa_s[y][x]=='O'):
+                    print 'ouro(p(%d,%d))' %(x+1, 12-y)
+                    pl_map.write('ouro(p(%d,%d))\n' %(x+1, 12-y))
+        pl_map.close()
 
-
+ml   = MapLoader('mapa.txt')
