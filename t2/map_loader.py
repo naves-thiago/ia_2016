@@ -39,7 +39,11 @@ class MapLoader:
 
         mapa_s = mf.readlines()
         mf.close()
-        self.max_x = len(mapa_s[0])-3 # Remove \r\n
+        if sys.version_info[0] < 3:
+            self.max_x = len(mapa_s[0])-3 # Remove \r\n
+        else:
+            self.max_x = len(mapa_s[0])-2 # Remove \n
+
         self.max_y = len(mapa_s)-1
 
         # Cria nos para as posicoes livres do mapa
