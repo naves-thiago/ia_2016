@@ -1,7 +1,7 @@
 import pygame
 import sys
 from map_loader import *
-from prolog import PrologMap
+from prolog import PrologActor
 
 # Configs ##############
 
@@ -65,6 +65,7 @@ def init(new_frame_cb):
     frame_cb = new_frame_cb
     pygame.init()
     screen = pygame.display.set_mode(window_size)
+    pygame.display.set_caption("Respect my authoritah!!")
 
     # Load sprites
     sprite_up       = Sprite("imagens/kenny.png", pygame.Rect(0, 0,   47, 47), (0.7, 0.7))
@@ -128,8 +129,8 @@ ml   = MapLoader("mapa.txt")
 mapa = ml.mapa
 _draw_map_full(mapa)
 
-pl = PrologMap()
-pl.atualiza_mapa()
+pl = PrologActor()
+pl.atualiza()
 mapa_t = pl.mapa
 #ml_t   = MapLoader("mapa_teste.txt")
 #mapa_t = ml_t.mapa
