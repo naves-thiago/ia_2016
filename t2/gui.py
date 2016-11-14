@@ -1,6 +1,7 @@
 import pygame
 import sys
 from map_loader import *
+from prolog import PrologMap
 
 # Configs ##############
 
@@ -41,6 +42,13 @@ class Sprite:
         ''' Draw self on the surface at position pos (x,y) '''
         surface.blit(self.img, pos)
 
+class ColorRect:
+    def __init__(self, color):
+        self.color = color
+
+    def draw(self, surface, pos):
+        pygame.draw.rect(surface, self.color, pygame.Rect(pos, sprite_size))
+
 # Surface, Map
 def _draw_map(s, m):
     s.fill((0, 100, 20))
@@ -70,9 +78,11 @@ def init(new_frame_cb):
     sprite_gold     = Sprite("imagens/coins_1.png", None, (0.6, 0.6))
     sprite_powerup  = Sprite("imagens/chinpokomon.png", None, (0.6, 0.6))
     sprite_teleport = Sprite("imagens/teleport.png")
+    sprite_unknown  = ColorRect(pygame.Color(0,0,0))
 
     sprites = {"D":sprite_enemy1, "d":sprite_enemy2,   "U":sprite_powerup,
-               "P":sprite_hole,   "T":sprite_teleport, "O":sprite_gold}
+               "P":sprite_hole,   "T":sprite_teleport, "O":sprite_gold,
+               "?":sprite_unknown}
 
     directions = {"U":sprite_up, "D":sprite_down, "L":sprite_left, "R":sprite_right}
 
@@ -118,8 +128,11 @@ ml   = MapLoader("mapa.txt")
 mapa = ml.mapa
 _draw_map_full(mapa)
 
-ml_t   = MapLoader("mapa_teste.txt")
-mapa_t = ml_t.mapa
+pl = PrologMap()
+pl.atualiza_mapa()
+mapa_t = pl.mapa
+#ml_t   = MapLoader("mapa_teste.txt")
+#mapa_t = ml_t.mapa
 _draw_map_actor(mapa_t)
 
 #_draw_map(s_map_full, mapa)
