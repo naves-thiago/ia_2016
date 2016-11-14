@@ -66,22 +66,22 @@ class MapLoader:
                 # sprites = {'D':sprite_enemy1, 'd':sprite_enemy2,   'U':sprite_powerup,
                 #           'P':sprite_hole,   'T':sprite_teleport, 'O':sprite_gold}
                 if (mapa_s[y][x]=='D'):
-                    #print 'inimigoD(p(',x+1,',',y+1,'),100)'
+                    print('Assert: m_inimigoD(p(%d,%d),100).' %(x+1, 12-y))
                     pl_map.write('m_inimigoD(p(%d,%d),100).\n' %(x+1, 12-y))
                 elif (mapa_s[y][x]=='d'):
-                    #print 'inimigod(p(%d,%d),100)' %(x+1, 12-y)
+                    print('Assert: m_inimigod(p(%d,%d),100).' %(x+1, 12-y))
                     pl_map.write('m_inimigod(p(%d,%d),100).\n' %(x+1, 12-y))
                 elif (mapa_s[y][x]=='U'):
-                    #print 'powerup(p(%d,%d))' %(x+1, 12-y)
+                    print('Assert: m_powerup(p(%d,%d)).' %(x+1, 12-y))
                     pl_map.write('m_powerup(p(%d,%d)).\n' %(x+1, 12-y))
                 elif (mapa_s[y][x]=='P'):
-                    #print 'buraco(p(%d,%d))' %(x+1, 12-y)
+                    print('Assert: m_buraco(p(%d,%d)).' %(x+1, 12-y))
                     pl_map.write('m_buraco(p(%d,%d)).\n' %(x+1, 12-y))
                 elif (mapa_s[y][x]=='T'):
-                    #print 'teleport(p(%d,%d))' %(x+1, 12-y)
+                    print('Assert: m_teleport(p(%d,%d)).' %(x+1, 12-y))
                     pl_map.write('m_teleport(p(%d,%d)).\n' %(x+1, 12-y))
                 elif (mapa_s[y][x]=='O'):
-                    #print 'ouro(p(%d,%d))' %(x+1, 12-y)
+                    print('Assert: m_ouro(p(%d,%d)).' %(x+1, 12-y))
                     pl_map.write('m_ouro(p(%d,%d)).\n' %(x+1, 12-y))
         pl_map.close()
 
