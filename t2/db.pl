@@ -1,3 +1,26 @@
+:- include(mapa).
+
+:- dynamic([
+	visitado/1,
+	
+	brisa/1,
+	pburaco/1,
+	buraco,
+	
+	passos/1,
+	inimigo/1,
+	
+	flash/1,
+	teleport/1,
+	
+	ouro/1,
+	powerup/1,
+	
+	balas/1,
+	vida/1
+]).
+
+/*
 :- dynamic brisa/2.
 :- dynamic nbrisa/2.
 :- dynamic buraco/1.
@@ -15,9 +38,9 @@
 :- dynamic powerup/2.
 :- dynamic balas/1.
 :- dynamic vida/1.
+*/
 
 /* p(X, Y) = point(X,Y) */
-
 norte(p(X, Y), C) :-
   Y2 is Y + 1,
   C = p(X, Y2).
@@ -50,7 +73,18 @@ sudoeste(p(X,Y), C) :-
   sul(p(X,Y), C2),
   oeste(C2, C).
 
+adjacente(p(X,Y), C) :-
+	norte(p(X,Y), C);
+	sul(p(X,Y), C);
+	leste(p(X,Y), C);
+	oeste(p(X,Y), C).
 
+diagonal(p(X,Y), C) :-
+	noroeste(p(X,Y), C);
+	nordeste(p(X,Y), C);
+	sudoeste(p(X,Y), C);
+	sudeste(p(X,Y), C).
+	
 parede(p(X,Y)) :- parede(X,Y).
 parede(0,_).
 parede(_,0).
@@ -63,24 +97,19 @@ livre(2,1).
 livre(1,2).
 
 /* Sabidamente nao tem brisa */
-nbrisa(p(X,Y)) :- nbrisa(X,Y).
-nbrisa(1,1).
+/*nbrisa(p(X,Y)) :- nbrisa(X,Y).
+nbrisa(1,1).*/
 
 brisa(p(X,Y)) :- brisa(X,Y).
-
-/* Teste ----- */
-brisa(1,2).
-brisa(2,1).
-brisa(3,2).
-brisa(2,3).
-/* ----------- */
+brisa(p(X,Y)) :- m_buraco(p(W,Z)), adjacente(p(X,Y), p(W,Z)).
 
 /* Sabidamente nao eh buraco */
-nburaco(P) :- livre(P); parede(P). /* Adicionar outros inimigos aqui */
+/* Adicionar outros inimigos aqui */
+/*nburaco(P) :- livre(P); parede(P).
 nburaco(P) :- norte(P, N), nbrisa(N).
 nburaco(P) :- sul(P, S),   nbrisa(S).
 nburaco(P) :- leste(P, L), nbrisa(L).
-nburaco(P) :- oeste(P, O), nbrisa(O).
+nburaco(P) :- oeste(P, O), nbrisa(O).*/
 
 /* Possivel buraco */
 pburaco(P) :- (\+ nburaco(P)), norte(P, N), brisa(N).
@@ -154,7 +183,7 @@ prox_mesma_dir(P, D, P2) :- (D = 'o'), oeste(P, P2).
 prox_1_giro(P, D, P2) :- (D = 'n'), leste(P, P2).
 prox_1_giro(P, D, P2) :- (D = 's'), oeste(P, P2).
 prox_1_giro(P, D, P2) :- (D = 'l'), sul(P, P2).
-prox_1_giro(P, D, P2) :- (D = 'o'), norteP, P2).
+prox_1_giro(P, D, P2) :- (D = 'o'), norte(P, P2).
 
 /* P = Posicao atual
  * D = Direcao atual ('n', 's', 'l', 'o')
