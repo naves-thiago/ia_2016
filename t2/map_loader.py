@@ -2,12 +2,16 @@ import sys
 
 class No:
     ''' Representa uma posicao para a qual podemos andar no mapa '''
-    def __init__(self, x, y, tipo, custo=1, anterior=None, custo_acumulado=None):
+    def __init__(self, x, y, tipo, custo=1):
         self.pos = (x,y)         # Posicao (x,y) no mapa
         self.tipo = tipo         # Tipo de No (para podermos representar na tela)
-        self.anterior = anterior # De onde viemos
-        self.custo = custo       # Custo de passar por esse No
-        self.custo_acumulado = custo_acumulado # Custo acumulado da origem ate esse No
+
+        # Variaveis de estado para busca
+        self.anterior = None        # De onde viemos
+        self.custo = custo          # Custo de passar por esse No
+        self.custo_acumulado = None # Custo acumulado da origem ate esse No
+        self.direcao = None         # Direcao em que entramos nesse No
+        self.prioridade = 9999999   # Define a ordem dos Nos na heap
 
     def __str__(self):
         ''' Retorna uma string que representa esse no.
@@ -18,7 +22,7 @@ class No:
         ''' Permite comparar 2 Nos. (python 3)
             Compara os custos (eu sou menor que other?) '''
         if isinstance(other, No):
-            return self.custo < other.custo
+            return self.prioridade < other.prioridade
         else:
             return False
 
@@ -62,7 +66,7 @@ class MapLoader:
             linha = []
             self.mapa.append(linha)
             for x in range(self.max_x+1):
-                linha.append(No(x+1, 12-y, mapa_s[y][x]))
+                linha.append(No(x, y, mapa_s[y][x]))
                 # sprites = {'D':sprite_enemy1, 'd':sprite_enemy2,   'U':sprite_powerup,
                 #           'P':sprite_hole,   'T':sprite_teleport, 'O':sprite_gold}
                 if (mapa_s[y][x]=='D'):
@@ -86,4 +90,4 @@ class MapLoader:
         pl_map.close()
 
 #Teste
-ml   = MapLoader('mapa.txt')
+#ml   = MapLoader('mapa.txt')
