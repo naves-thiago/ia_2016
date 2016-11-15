@@ -2,10 +2,9 @@ import pyswip
 from map_loader import No
 
 class PrologActor:
-    def __init__(self):
+    def __init__(self, arquivo):
         self.pl = pyswip.Prolog()
-        #self.pl.consult("db.pl")
-        self.pl.consult("teste.pl")
+        self.pl.consult(arquivo)
 
         # Cria um mapa vazio
         mapa = []

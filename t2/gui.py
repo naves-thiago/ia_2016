@@ -10,11 +10,9 @@ sprite_size = (50, 50)
 map_size    = (12 * sprite_size[0], 12 * sprite_size[1])
 maps_dist   = 50 # distance between the two maps
 window_size = (2 * map_size[0] + maps_dist, map_size[1])
-FPS = 24
+FPS = 4
 
 ########################
-
-frame_cb = None # Called before each frame to allow application to update the actor / map
 
 class Sprite:
     def __init__(self, img_file, rect=None, scale=(1,1)):
@@ -47,117 +45,131 @@ class ColorRect:
         self.color = color
 
     def draw(self, surface, pos):
+        ''' Draw self on the surface at position pos (x,y) '''
         pygame.draw.rect(surface, self.color, pygame.Rect(pos, sprite_size))
 
-# Surface, Map
-def _draw_map(s, m):
-    s.fill((0, 100, 20))
-    for y in range(len(m)):
-        for x in range(len(m[0])):
-            if sprites.get(m[y][x].tipo):
-                sprites[m[y][x].tipo].draw(s, (x * sprite_size[0], y * sprite_size[1]));
+class Gui:
+    # Surface, Map
+    def _draw_map(self, s, m):
+        s.fill((0, 100, 20))
+        for y in range(len(m)):
+            for x in range(len(m[0])):
+                if self.sprites.get(m[y][x].tipo):
+                    self.sprites[m[y][x].tipo].draw(s, (x * sprite_size[0], y * sprite_size[1]));
 
-def init(new_frame_cb):
-    global screen, sprite_up, sprite_right, sprite_left, sprite_hole, sprite_enemy1
-    global sprite_enemy2, sprite_gold, sprite_teleport, sprite_powerup, sprites
-    global s_map_full, s_map_actor, directions, frame_cb
+    def __init__(self, new_frame_cb):
+        self.frame_cb = new_frame_cb # Called before each frame to allow application to update the actor / map
+        pygame.init()
+        self.screen = pygame.display.set_mode(window_size)
+        pygame.display.set_caption("Respect my authoritah!!")
 
-    frame_cb = new_frame_cb
-    pygame.init()
-    screen = pygame.display.set_mode(window_size)
-    pygame.display.set_caption("Respect my authoritah!!")
+        # Load sprites
+        sprite_up       = Sprite("imagens/kenny.png", pygame.Rect(0, 0,   47, 47), (0.7, 0.7))
+        sprite_right    = Sprite("imagens/kenny.png", pygame.Rect(0, 47,  47, 47), (0.7, 0.7))
+        sprite_down     = Sprite("imagens/kenny.png", pygame.Rect(0, 94,  47, 47), (0.7, 0.7))
+        sprite_left     = Sprite("imagens/kenny.png", pygame.Rect(0, 141, 47, 47), (0.7, 0.7))
 
-    # Load sprites
-    sprite_up       = Sprite("imagens/kenny.png", pygame.Rect(0, 0,   47, 47), (0.7, 0.7))
-    sprite_right    = Sprite("imagens/kenny.png", pygame.Rect(0, 47,  47, 47), (0.7, 0.7))
-    sprite_down     = Sprite("imagens/kenny.png", pygame.Rect(0, 94,  47, 47), (0.7, 0.7))
-    sprite_left     = Sprite("imagens/kenny.png", pygame.Rect(0, 141, 47, 47), (0.7, 0.7))
+        sprite_hole     = Sprite("imagens/hole.png", None, (0.7, 0.7))
+        sprite_enemy1   = Sprite("imagens/satan.png")
+        sprite_enemy2   = Sprite("imagens/saddam-hussein.png")
+        sprite_gold     = Sprite("imagens/coins_1.png", None, (0.6, 0.6))
+        sprite_powerup  = Sprite("imagens/chinpokomon.png", None, (0.6, 0.6))
+        sprite_teleport = Sprite("imagens/teleport.png")
+        sprite_unknown  = ColorRect(pygame.Color(0,0,0))
 
-    sprite_hole     = Sprite("imagens/hole.png", None, (0.7, 0.7))
-    sprite_enemy1   = Sprite("imagens/satan.png")
-    sprite_enemy2   = Sprite("imagens/saddam-hussein.png")
-    sprite_gold     = Sprite("imagens/coins_1.png", None, (0.6, 0.6))
-    sprite_powerup  = Sprite("imagens/chinpokomon.png", None, (0.6, 0.6))
-    sprite_teleport = Sprite("imagens/teleport.png")
-    sprite_unknown  = ColorRect(pygame.Color(0,0,0))
+        self.sprites = {"D":sprite_enemy1, "d":sprite_enemy2,   "U":sprite_powerup,
+                        "P":sprite_hole,   "T":sprite_teleport, "O":sprite_gold,
+                        "?":sprite_unknown}
 
-    sprites = {"D":sprite_enemy1, "d":sprite_enemy2,   "U":sprite_powerup,
-               "P":sprite_hole,   "T":sprite_teleport, "O":sprite_gold,
-               "?":sprite_unknown}
+        self.directions = {"U":sprite_up, "D":sprite_down, "L":sprite_left, "R":sprite_right}
 
-    directions = {"U":sprite_up, "D":sprite_down, "L":sprite_left, "R":sprite_right}
+        self.s_map_full  = pygame.Surface(map_size, pygame.SRCALPHA, 32)
+        self.s_map_actor = pygame.Surface(map_size, pygame.SRCALPHA, 32)
 
-    s_map_full  = pygame.Surface(map_size, pygame.SRCALPHA, 32)
-    s_map_actor = pygame.Surface(map_size, pygame.SRCALPHA, 32)
+        self.set_actor_position((0, 11), "U")
 
-def _draw_map_full(m):
-    ''' Draws a new version of the full map. '''
-    global s_map_full, screen
-    _draw_map(s_map_full, m)
-    screen.blit(s_map_full, (0,0))
+    def set_actor_position(self, pos, direction):
+        ''' Updates both maps with a new actor position and direction. '''
+        full_map_pos = (map_size[0] + maps_dist, 0)
+        self.screen.blit(self.s_map_full, full_map_pos)
+        self.screen.blit(self.s_map_actor, (0, 0))
+        self.actor_pos = pos
+        self.actor_dir = direction
 
-def _draw_map_actor(m):
-    ''' Draws a new version of the actor map. '''
-    global s_map_actor, screen
-    _draw_map(s_map_actor, m)
-    screen.blit(s_map_actor, (0,0))
+    def set_map_full(self, m):
+        ''' Updates the full map. '''
+        self.map_full = m
 
-def set_actor_position(pos, direction):
-    ''' Updates both maps with a new actor position and direction. '''
-    global s_map_actor, s_map_full, actor_pos, actor_dir, screen
-    f_map_pos = (map_size[0] + maps_dist, 0)
-    screen.blit(s_map_full, f_map_pos)
-    screen.blit(s_map_actor, (0, 0))
-    actor_pos = pos
-    actor_dir = direction
+    def set_map_actor(self, m):
+        ''' Updates the actor map. '''
+        self.map_actor = m
 
-def _draw_actor():
-    ''' Draws the actor on both maps. '''
-    global screen, directions, actor_pos, actor_dir
-    sprite = directions[actor_dir]
-    act_offset = (sprite_size[0] * actor_pos[0], sprite_size[1] * actor_pos[1])
+    def _draw_map_full(self):
+        ''' Draws a new version of the full map. '''
+        full_map_pos = (map_size[0] + maps_dist, 0)
+        self._draw_map(self.s_map_full, self.map_full)
+        self.screen.blit(self.s_map_full, full_map_pos)
 
-    f_map_pos = (map_size[0] + maps_dist, 0)
-    f_act_pos = (f_map_pos[0] + act_offset[0], f_map_pos[1] + act_offset[1])
+    def _draw_map_actor(self):
+        ''' Draws a new version of the actor map. '''
+        self._draw_map(self.s_map_actor, self.map_actor)
+        self.screen.blit(self.s_map_actor, (0,0))
 
-    sprite.draw(screen, f_act_pos)  # Full Map
-    sprite.draw(screen, act_offset) # Actor map
+    def _draw_actor(self):
+        ''' Draws the actor on both maps. '''
+        sprite = self.directions[self.actor_dir]
+        act_offset = (sprite_size[0] * self.actor_pos[0], sprite_size[1] * self.actor_pos[1])
+
+        full_map_pos = (map_size[0] + maps_dist, 0)
+        full_act_pos = (full_map_pos[0] + act_offset[0], full_map_pos[1] + act_offset[1])
+
+        sprite.draw(self.screen, full_act_pos)  # Full Map
+        sprite.draw(self.screen, act_offset)    # Actor map
+
+    def start_draw_loop(self):
+        ''' Main update / redraw loop. '''
+        # Update the map / actor state
+        self.frame_cb()
+        clock = pygame.time.Clock()
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    #sys.exit()
+                    return
+
+            self.frame_cb()
+            self._draw_map_actor()
+            self._draw_map_full()
+            self._draw_actor()
+            pygame.display.flip()
+            clock.tick(FPS)
+
 
 # Test code
-init(None)
-ml   = MapLoader("mapa.txt")
-mapa = ml.mapa
-_draw_map_full(mapa)
-
-pl = PrologActor()
-pl.atualiza()
-mapa_t = pl.mapa
-#ml_t   = MapLoader("mapa_teste.txt")
-#mapa_t = ml_t.mapa
-_draw_map_actor(mapa_t)
-
-#_draw_map(s_map_full, mapa)
-#screen.blit(s_map_full, (0,0))
-
-set_actor_position((0, 11), "U")
-_draw_actor()
-
-# s.fill((0, 100, 20))
-# sprite_up.draw(s, (10, 10))
-# sprite_right.draw(s, (80, 10))
-# sprite_down.draw(s, (150, 10))
-# sprite_left.draw(s, (230, 10))
-# sprite_hole.draw(s, (300, 10))
-# sprite_enemy1.draw(s, (10, 80))
-# sprite_enemy2.draw(s, (80, 80))
-# sprite_gold.draw(s, (150, 80))
-pygame.display.flip()
-#####
-
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-
-
+## init(None)
+## ml   = MapLoader("mapa.txt")
+## mapa = ml.mapa
+## _draw_map_full(mapa)
+## 
+## pl = PrologActor()
+## pl.atualiza()
+## mapa_t = pl.mapa
+## #ml_t   = MapLoader("mapa_teste.txt")
+## #mapa_t = ml_t.mapa
+## _draw_map_actor(mapa_t)
+## 
+## set_actor_position((0, 11), "U")
+## _draw_actor()
+## 
+## pygame.display.flip()
+## #####
+## 
+## while True:
+##     for event in pygame.event.get():
+##         if event.type == pygame.QUIT:
+##             pygame.quit()
+##             sys.exit()
+## 
+## 
