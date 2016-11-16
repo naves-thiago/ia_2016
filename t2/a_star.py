@@ -25,7 +25,8 @@ class A_star:
 
         return res
 
-    def _distancia(self, a, b):
+    @staticmethod
+    def _distancia(a, b):
         ''' Calcula a distancia manhattan entre os Nos a e b. '''
         if a == None or b == None:
             return 0
@@ -46,9 +47,10 @@ class A_star:
         return d
 
     _num_rotacao = {"U":1, "R":2, "D":3, "L":4}
-    def _rotacoes(self, orig, dest, direcao):
+    @staticmethod
+    def rotacoes(orig, dest, direcao):
         ''' Calcula quantas rotacoes fazer para ir de orig para dest.
-            _rotacoes(orig, dest, direcao) -> numero de rotacoes. '''
+            rotacoes(orig, dest, direcao) -> numero de rotacoes. '''
         #      1
         #      ^
         #      |
@@ -60,8 +62,8 @@ class A_star:
         # Atribuindo um dos numeros acima a cada direcao, podemos
         # calcular o numero de rotacoes por (dest - orig + 4) % 4
 
-        o = self._num_rotacao[direcao]
-        d = self._num_rotacao[self.direcao(orig, dest)]
+        o = A_star._num_rotacao[direcao]
+        d = A_star._num_rotacao[A_star.direcao(orig, dest)]
 
         return (d - o + 4) % 4
 
@@ -102,7 +104,7 @@ class A_star:
 
         viz = self._vizinhos(atual)
         for v in viz:
-            custo = atual.custo_acumulado + v.custo + self._rotacoes(atual, v, atual.direcao)
+            custo = atual.custo_acumulado + v.custo + self.rotacoes(atual, v, atual.direcao)
             if v.custo_acumulado == None or v.custo_acumulado > custo:
                 prioridade = custo + self._distancia(self.no_fim, v)
                 v.custo_acumulado = custo           # Custo de ir de no_ini ate v

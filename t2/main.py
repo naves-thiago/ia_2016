@@ -29,11 +29,24 @@ def find_unvisited():
 
     return melhor
 
+def path_to_move_sequence(dest):
+    seq = [] # Sequencia de posicoes
+    res = [] # Sequencia de passos (vira, anda...)
+    a = dest
+    while a:
+        seq.insert(0, a)
+        a = a.anterior
+
+    for i in range(len(seq)-1):
+        # Roda o numero de vezes necessario
+        res.extend(A_star.rotacoes(seq[i], seq[i+1], seq[i].direcao) * ["R"])
+        res.append("A") # Anda pra frente
+
+    return res
 
 # Ponto de entrada do programa
 map_full = MapLoader("mapa.txt").mapa
 pl = PrologActor("teste.pl")
 gui = Gui(update_map)
 gui.set_map_full(map_full)
-#gui.set_map_actor(map_full)
 gui.start_draw_loop()
