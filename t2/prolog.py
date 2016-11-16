@@ -20,6 +20,8 @@ class PrologActor:
         self.dir    = "U"     # Direcao do ator
         self.vida   = 100
         self.pontos = 0
+        self.ouros  = 0
+        self.balas  = 5
 
         self.atualiza()
 
@@ -54,6 +56,13 @@ class PrologActor:
         else:
             self.rodar()
 
+    def melhor_acao(self):
+        ''' Consulta qual e a melhor acao a fazer. '''
+        query = self._query("prox(X)")
+        r = next(query)
+        query.close()
+        return r["X"]
+
     def _muda_no(self, x, y, tipo):
         ''' Troca o tipo de um No do mapa, convertendo as coordenadas do prolog. '''
         # Converte coordenadas
@@ -66,54 +75,51 @@ class PrologActor:
         #print("Query: " + qry)
         return self.pl.query(qry)
 
+    def _query_single(self, qry):
+        ''' Faz uma consulta no prolog e le apenas o primeiro resultado. '''
+        query = self._query(qry)
+        r = next(query)
+        query.close()
+        return r
+
     def atualiza(self):
         ''' Le o estado do ator e o conhecimento do mapa do prolog. '''
         self._atualiza_mapa()
-        query = self._query("posicao(p(X, Y))")
-        r = next(query)
-        query.close()
+        r = self._query_single("posicao(p(X, Y))")
         self.pos[0] = r['X'] - 1
         self.pos[1] = 12 - r['Y']
 
-        query = self._query("vida(X)")
-        r = next(query)
-        query.close()
+        r = self._query_single("vida(X)")
         self.vida = r['X']
 
-        query = self._query("pontos(X)")
-        r = next(query)
-        query.close()
+        r = self._query_single("pontos(X)")
         self.pontos = r['X']
 
-        query = self._query("direcao(X)")
-        r = next(query)
-        query.close()
+        r = self._query_single("direcao(X)")
         self.dir = r['X']
 
-        # Teste
-        #print("Pos: %s\nVida: %d\nPontos: %d\nDir: %s\n" % (str(self.pos), self.vida, self.pontos, self.dir))
+        r = self._query_single("o_coletados(X)")
+        self.ouros = r["X"]
+
+        r = self._query_single("balas(X)")
+        self.balas = r["X"]
 
     def _atualiza_mapa(self):
         ''' Atualiza o mapa com o conhecimento do prolog. '''
-        for p in self._query("buraco(p(X, Y))"):
+        for p in self._query("pburaco(p(X, Y))"):
             x = p['X']
             y = p['Y']
             self._muda_no(x, y, 'P')
 
-        for p in self._query("teleport(p(X, Y))"):
+        for p in self._query("pteleport(p(X, Y))"):
             x = p['X']
             y = p['Y']
             self._muda_no(x, y, 'T')
 
-        for p in self._query("inimigoD(p(X, Y), _)"):
+        for p in self._query("pinimigo(p(X, Y))"):
             x = p['X']
             y = p['Y']
             self._muda_no(x, y, 'D')
-
-        for p in self._query("inimigod(p(X, Y), _)"):
-            x = p['X']
-            y = p['Y']
-            self._muda_no(x, y, 'd')
 
         for p in self._query("powerup(p(X, Y))"):
             x = p['X']

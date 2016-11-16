@@ -10,6 +10,7 @@ from a_star import A_star
 # "P" - Pegar ouro / powerup
 # "S" - Ir para a saida
 # "D" - Ir para uma posicao desconhecida
+# "I" - Subir
 
 navegando = False   # Se true, estamos seguindo o caminho abaixo
 caminho = []        # Caminho gerado pelo A*
@@ -21,10 +22,6 @@ fim_nav = False
 # Chamada do main loop para atualizar o agente e a tela
 def update_map():
     global navegando, prox_passo, prox_caminho, caminho, passos_caminho, fim_nav
-    #pl.atualiza()
-    mapa_ator = pl.mapa
-    gui.set_map_actor(mapa_ator)
-    gui.set_status("Pontos: %d   Vida: %d" % (pl.pontos, pl.vida))
 
     #### TESTE
     if navegando and not fim_nav:
@@ -44,10 +41,14 @@ def update_map():
 
     if not navegando and not fim_nav:
         navegando = True
-        find_path(pl.mapa, pl.mapa[11][0], "U", pl.mapa[5][5])
+        find_path(pl.mapa, pl.mapa[pl.pos[1]][pl.pos[0]], pl.dir, pl.mapa[5][5])
         gui.set_path(caminho, 0)
     #######
 
+    #pl.atualiza()
+    mapa_ator = pl.mapa
+    gui.set_map_actor(mapa_ator)
+    gui.set_status("Pontos: %d   Vida: %d   Ouros: %d   Balas: %d" % (pl.pontos, pl.vida, pl.ouros, pl.balas))
     gui.set_actor_position(pl.pos, pl.dir)
 
 def find_path(mapa, ini, dir_ini, fim):
