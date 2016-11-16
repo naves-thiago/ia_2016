@@ -14,6 +14,32 @@ livre(1, 1).
 livre(2, 1).
 livre(1, 2).
 
+/*
+livre(1, 3).
+livre(1, 4).
+livre(2, 4).
+livre(3, 4).
+livre(4, 4).
+livre(5, 4).
+livre(6, 4).
+livre(7, 4).
+livre(7, 5).
+livre(7, 6).
+livre(7, 7).
+*/
+
+
+livre(1, 3).
+livre(1, 4).
+livre(1, 5).
+livre(1, 6).
+livre(1, 7).
+livre(2, 7).
+livre(3, 7).
+livre(4, 7).
+livre(5, 7).
+livre(6, 7).
+
 livre(12, 12).
 livre(1, 12).
 livre(12, 1).
@@ -28,4 +54,4 @@ ouro(p(4, 1)).
 posicao(p(1, 1)).
 pontos(50).
 vida(70).
-direcao('R').
+direcao('U').

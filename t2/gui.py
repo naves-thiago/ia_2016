@@ -6,7 +6,8 @@ from prolog import PrologActor
 # Configs ##############
 
 #sprite_size = (47, 47)
-sprite_size = (50, 50)
+#sprite_size = (50, 50)
+sprite_size = (40, 40)
 map_size    = (12 * sprite_size[0], 12 * sprite_size[1])
 maps_dist   = 30 # distance between the two maps
 font_name   = "arial"
@@ -14,7 +15,7 @@ font_size   = 25
 font_color  = (0, 150, 0)
 text_offset = (10, 10)
 bg_color    = (0, 0, 50)
-FPS = 4
+FPS         = 4
 
 ########################
 
@@ -135,6 +136,7 @@ class Gui:
         sprite.draw(self.screen, act_offset)    # Actor map
 
     def _draw_text(self):
+        ''' Draws the status text. '''
         ren  = self.font.render(self.status_text, True, font_color)
         pos  = (text_offset[0], text_offset[1] + map_size[1])
         self.screen.blit(ren, pos)
@@ -142,6 +144,30 @@ class Gui:
     def set_status(self, txt):
         ''' Sets the status text. '''
         self.status_text = txt
+
+    def _draw_path(self):
+        ''' Draws a line showing a path on both maps. '''
+        if not self.path:
+            return
+
+        s = pygame.Surface(map_size, pygame.SRCALPHA, 32)
+        pygame.draw.lines(s, (150, 0, 0), False, self.path, 3)
+
+        self.screen.blit(s, (0,0))
+        self.screen.blit(s, (map_size[0] + maps_dist, 0))
+
+    def set_path(self, path, start_index):
+        ''' Defines a list of nodes to trace a path onto. '''
+        if path == None or len(path) - start_index == 1:
+            self.path = None
+            return
+
+        points = []
+        for i in range(start_index, len(path)):
+            points.append(pygame.Rect((path[i].pos[0] * sprite_size[0], path[i].pos[1] * sprite_size[1]), sprite_size).center)
+            #points.append((int((path[i].pos[0] + sprite_size[0]) / 2) * sprite_size[0], int((path[i].pos[1] + sprite_size[1]) / 2) * sprite_size[0]))
+
+        self.path = points
 
     def start_draw_loop(self):
         ''' Main update / redraw loop. '''
@@ -160,6 +186,7 @@ class Gui:
             self.frame_cb()
             self._draw_map_actor()
             self._draw_map_full()
+            self._draw_path()
             self._draw_actor()
             self._draw_text()
             pygame.display.flip()

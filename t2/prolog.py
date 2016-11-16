@@ -21,6 +21,39 @@ class PrologActor:
         self.vida   = 100
         self.pontos = 0
 
+        self.atualiza()
+
+    def andar_frente(self):
+        # FIXME
+        if self.dir == "R":
+            self.pos[0] += 1
+        elif self.dir == "L":
+            self.pos[0] -= 1
+        elif self.dir == "U":
+            self.pos[1] -= 1
+        else:
+            self.pos[1] += 1
+
+        print("POS: " + str(self.pos) + "  - " + self.dir)
+
+    def rodar(self):
+        # FIXME
+        if self.dir == "R":
+            self.dir = "D"
+        elif self.dir == "L":
+            self.dir = "U"
+        elif self.dir == "U":
+            self.dir = "R"
+        else:
+            self.dir = "L"
+
+    def acao(self, a):
+        # TODO completar
+        if a == "A":
+            self.andar_frente()
+        else:
+            self.rodar()
+
     def _muda_no(self, x, y, tipo):
         ''' Troca o tipo de um No do mapa, convertendo as coordenadas do prolog. '''
         # Converte coordenadas
@@ -30,7 +63,7 @@ class PrologActor:
 
     def _query(self, qry):
         ''' Faz uma consulta no prolog e imprime a consulta no console. '''
-        print("Query: " + qry)
+        #print("Query: " + qry)
         return self.pl.query(qry)
 
     def atualiza(self):
