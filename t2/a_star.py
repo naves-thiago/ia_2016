@@ -6,23 +6,24 @@ class A_star:
         ''' Retorna a lista de vizinhos do no '''
         res = []
         x, y = no.pos
-        if x > 0 and self.mapa[y][x-1].tipo != "?":
+        if x > 0 and self.mapa[y][x-1].tipo == ".":
             res.append(self.mapa[y][x-1])
 
-        if x < self.max_x and self.mapa[y][x+1].tipo != "?":
+        if x < self.max_x and self.mapa[y][x+1].tipo == ".":
             res.append(self.mapa[y][x+1])
 
-        if y > 0 and self.mapa[y-1][x].tipo != "?":
+        if y > 0 and self.mapa[y-1][x].tipo == ".":
             res.append(self.mapa[y-1][x])
 
-        if y < self.max_y and self.mapa[y+1][x].tipo != "?":
+        if y < self.max_y and self.mapa[y+1][x].tipo == ".":
             res.append(self.mapa[y+1][x])
 
         return res
 
     def _distancia(self, a, b):
         ''' Calcula a distancia manhattan entre a e b. a e b sao nos. '''
-        #return 0
+        if a == None or b == None:
+            return 0
         return abs(b.pos[0] - a.pos[0]) + abs(b.pos[1] - a.pos[1])
 
     @staticmethod
@@ -106,3 +107,9 @@ class A_star:
                 heapq.heappush(self.fronteira, (prioridade, v))
 
         return (atual, viz)
+
+    def run(self):
+        ''' Executa todas as iteracoes da busca. '''
+        while self.step():
+            pass
+
