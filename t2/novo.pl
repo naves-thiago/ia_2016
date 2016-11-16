@@ -21,7 +21,9 @@
 	teleport/1,
 	
 	ouro/1,
+	o_coletados/1,
 	powerup/1,
+	p_coletados/1,
 	
 	posicao/1,
 	vida/1,
@@ -71,12 +73,6 @@ diagonal(p(X,Y), C) :-
 /*parede*/
 parede(p(X,Y)) :- X < 1; Y < 1; X > 12; Y > 12.
 
-/*conhecimento inicial*/
-/*livre(p(X,Y)) :- livre(X,Y).
-livre(1,1).
-livre(2,1).
-livre(1,2).*/
-
 /*estado*/
 reset :- 
 	retractall(visitado(_)),
@@ -95,12 +91,16 @@ reset :-
 	retractall(nteleport(_)),
 	retractall(teleport(_)),
 	retractall(ouro(_)),
+	retractall(o_coletados(_)),
 	retractall(powerup(_)),
+	retractall(p_coletados(_)),
 	retractall(posicao(_)),
 	retractall(vida(_)),
 	retractall(pontos(_)),
 	retractall(balas(_)),
 	retractall(direcao(_)),
+	assert(o_coletados(0)),
+	assert(p_coletados(0)),
 	assert(posicao(p(1,1))),
 	assert(vida(100)),
 	assert(pontos(0)),
@@ -218,20 +218,29 @@ observar :- posicao(P), assertThis(visitado(P)),
 		/*se A eh nburaco, ninimigo e nteleport tira nCoisa e poe livre(A)*/
 		(nburaco(A), ninimigo(A), nteleport(A), retractThis(nburaco(A)), retractThis(ninimigo(A)), retractThis(nteleport(A)), assertThis(livre(A)), false);
 		
+		/*se tem powerup em P, guarda powerup(A)*/
+		(m_powerup(P), assertThis(powerup(P)), false);
+		
+		/*se tem ouro em P, guarda ouro(A)*/
+		(m_ouro(P), assertThis(ouro(P)), false);
+		
 		sofrer;
 		true
 	).
 
 sofrer :- posicao(P),
 (
-	/*se tem buraco, perde 1000 pontos e morre*/
-	(m_buraco(P), pontos(Q), R is Q - 1000, retractall(pontos(_)), assertThis(pontos(R)), retractall(vida(_)), assert(vida(0)));
-
 	/*se tem inimigo50, perde 50 pontos e toma 50 de dano*/
-	(m_inimigoD(P,_), pontos(Q), R is Q - 50, vida(V), U is V - 50, retractall(pontos(_)), assertThis(pontos(R)), retractall(vida(_)), assert(vida(U)));
+	(m_inimigoD(P,_), pontos(Q), R is Q - 50, vida(V), U is V - 50, retractall(pontos(_)), assertThis(pontos(R)), retractall(vida(_)), assert(vida(U)), false);
 
 	/*se tem inimigo20, perde 20 pontos e toma 20 de dano*/
-	(m_inimigod(P,_), pontos(Q), R is Q - 20, vida(V), U is V - 20, retractall(pontos(_)), assertThis(pontos(R)), retractall(vida(_)), assert(vida(U)));
+	(m_inimigod(P,_), pontos(Q), R is Q - 20, vida(V), U is V - 20, retractall(pontos(_)), assertThis(pontos(R)), retractall(vida(_)), assert(vida(U)), false);
+	
+	/*se tem buraco, perde e morre*/
+	(m_buraco(P), retractall(vida(_)), assert(vida(0)), false);
+	
+	/*se vida <= 0, perde 1000 pontos*/
+	(vida(V), V < 1, pontos(Q), R is Q - 1000, retractall(pontos(_)), assertThis(pontos(R)), false);
 	
 	/*se tem teleporte, eh teleportado, observa e sofre*/
 	(m_teleport(P), random_between(1, 12, X), random_between(1, 12, Y), retractall(posicao(_)), assert(posicao(p(X,Y))), observar);
@@ -239,13 +248,30 @@ sofrer :- posicao(P),
 	true
 ).
 
-atirar :- posicao(P), direcao(D), balas(M), M > 0, N is M - 1, retractall(balas(_)), assertThis(balas(N)),
+mata_inimigoD(T) :- write("grito"), retractall(m_inimigoD(T,_)), limpa_regiao_inimigo(T), retractThis(pinimigo(T)), assertThis(livre(T)),
+(
+	(adjacente(T,A), retractThis(passos(A)), false);
+	true
+).
+
+mata_inimigod(T) :- write("grito"), retractall(m_inimigod(T,_)), limpa_regiao_inimigo(T), retractThis(pinimigo(T)), assertThis(livre(T)),
+(
+	(adjacente(T,A), retractThis(passos(A)), false);
+	true
+).
+
+atirar :- posicao(P), direcao(D), balas(M), M > 0, N is M - 1, retractall(balas(_)), assertThis(balas(N)), pontos(Q), R is Q - 10, retractall(pontos(_)), assertThis(pontos(R)),
 	(
-		(D = 'U', norte(P, C2), assertThis(tiro(C2)));
-		(D = 'R', norte(P, C2), assertThis(tiro(C2)));
-		(D = 'D', norte(P, C2), assertThis(tiro(C2)));
-		(D = 'L', norte(P, C2), assertThis(tiro(C2)));
-	).
+		(D = 'U', norte(P, T), assertThis(tiro(T)));
+		(D = 'R', leste(P, T), assertThis(tiro(T)));
+		(D = 'D', sul(P, T), assertThis(tiro(T)));
+		(D = 'L', oeste(P, T), assertThis(tiro(T)))
+	),
+	(
+		m_inimigoD(T, V), random_between(20, 50, Dano), NV is V - Dano, retractThis(m_inimigoD(T,V)), assertThis(m_inimigoD(T,NV)), NV < 1, mata_inimigoD(T);
+		m_inimigod(T, V), random_between(20, 50, Dano), NV is V - Dano, retractThis(m_inimigod(T,V)), assertThis(m_inimigod(T,NV)), NV < 1, mata_inimigod(T)
+	),
+	retractThis(tiro(T)).
 
 /*SOMENTE PARA TESTE! APAGAR DEPOIS!!!*/
 andar_cima :- posicao(p(X,Y)), retractThis(posicao(p(X,Y))), NY is Y + 1, assertThis(posicao(p(X,NY))), observar.
