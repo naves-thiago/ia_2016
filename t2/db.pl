@@ -167,71 +167,64 @@ infere_brisa_ne(P) :- norte(P, N), leste(P, L), nordeste(P, NE),
 
 infere_brisa_se(P) :- sul(P, S), sul(S, S_S), infere_brisa_ne(S_S).
 
-/* P = Posicao atual
- * D = Direcao atual ('n', 's', 'l', 'o')
- * P2 = Proxima posicao
- */
-prox_mesma_dir(P, D, P2) :- (D = 'n'), norte(P, P2).
-prox_mesma_dir(P, D, P2) :- (D = 's'), sul(P, P2).
-prox_mesma_dir(P, D, P2) :- (D = 'l'), leste(P, P2).
-prox_mesma_dir(P, D, P2) :- (D = 'o'), oeste(P, P2).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Possivel problema
+pproblema(P) :- pburaco(P); pinimigo(P); pteleport(P); parede(P).
 
 /* P = Posicao atual
- * D = Direcao atual ('n', 's', 'l', 'o')
+ * D = Direcao atual ('U', 'D', 'R', 'L')
  * P2 = Proxima posicao
  */
-prox_1_giro(P, D, P2) :- (D = 'n'), leste(P, P2).
-prox_1_giro(P, D, P2) :- (D = 's'), oeste(P, P2).
-prox_1_giro(P, D, P2) :- (D = 'l'), sul(P, P2).
-prox_1_giro(P, D, P2) :- (D = 'o'), norte(P, P2).
+prox_mesma_dir(P, D, P2) :- (D = 'U'), norte(P, P2).
+prox_mesma_dir(P, D, P2) :- (D = 'D'), sul(P, P2).
+prox_mesma_dir(P, D, P2) :- (D = 'R'), leste(P, P2).
+prox_mesma_dir(P, D, P2) :- (D = 'L'), oeste(P, P2).
 
 /* P = Posicao atual
- * D = Direcao atual ('n', 's', 'l', 'o')
+ * D = Direcao atual ('U', 'D', 'R', 'L')
+ * P2 = Proxima posicao
+ */
+prox_1_giro(P, D, P2) :- (D = 'U'), leste(P, P2).
+prox_1_giro(P, D, P2) :- (D = 'D'), oeste(P, P2).
+prox_1_giro(P, D, P2) :- (D = 'R'), sul(P, P2).
+prox_1_giro(P, D, P2) :- (D = 'L'), norte(P, P2).
+
+/* P = Posicao atual
+ * D = Direcao atual ('U', 'D', 'R', 'L')
  * A = Acao:
- * A = 'a' -> andar pra frente
- * A = 'g' -> girar pra direita
- * A = 'p' -> pegar ouro / power up
- * A = 't' -> atirar
+ * A = 'T' -> atirar
+ * A = 'R' -> rodar pra direita
+ * A = 'A' -> andar pra frente
+ * A = 'P' -> pegar ouro / power up
+ * A = 'S' -> ir para a saida e sair
+ * A = 'D' -> ir para uma posicao desconhecida
+ * A = 'I' -> subir
 */
-prox(P, _, A) :- ouro(P), A = 'p'. /* Se estiver junto do ouro, pega */
+prox(A) :- posicao(P), ouro(P), A = 'P'. /* Se estiver junto do ouro, pega */
+
+% Se ja tiver todos os ouros, e esta na saida, sobe
+prox(A) :- ouros(3), A = 'I'.
+
+% Se ja tiver todos os ouros, vai pra saida
+prox(A) :- ouros(3), A = 'S'.
 
 /* Continua na mesma direcao, a nao ser que ja tenha visitado ou seja problema */
-prox(P, D, A) :- prox_mesma_dir(P, D, P2), (\+ pproblema(P2)), (\+ livre(P2)), A = 'a'.
+prox(A) :- posicao(P), direcao(D), prox_mesma_dir(P, D, P2), (\+ pproblema(P2)), (\+ livre(P2)), A = 'A'.
 
-/* Tenta girando 1 vez */
-prox(P, D, A) :- prox_1_giro(P, D, P2), (\+ pproblema(P2)), (\+ livre(P2)), A = 'g'.
-
-/* Tenta girando 2 vezes */
-prox(P, D, A) :-
-  prox_1_giro(P, D, P2),
-  prox_1_giro(P2, D, P3),
-  (\+ pproblema(P3)), (\+ livre(P3)), A = 'g'.
-
-/* Tenta girando 3 vezes */
-prox(P, D, A) :-
+/* Tenta girando vezes */
+prox(A) :-
+  posicao(P), direcao(D),
   prox_1_giro(P, D, P2),
   prox_1_giro(P2, D, P3),
   prox_1_giro(P3, D, P4),
-  (\+ pproblema(P4)), (\+ livre(P4)), A = 'g'.
+  (
+    ((\+ pproblema(P2)), (\+ livre(P2)), A = 'R');
+    ((\+ pproblema(P3)), (\+ livre(P3)), A = 'R');
+    ((\+ pproblema(P4)), (\+ livre(P4)), A = 'R')
+  ).
 
-/* todas as opcoes sao ja visitadas ou problematicas, tenta fugir de problema */
-
-/* Continua na mesma direcao, a nao ser que seja problema */
-prox(P, D, A) :- prox_mesma_dir(P, D, P2), (\+ pproblema(P2)), A = 'a'.
-
-/* Tenta girando 1 vez */
-prox(P, D, A) :- prox_1_giro(P, D, P2), (\+ pproblema(P2)), A = 'g'.
-
-/* Tenta girando 3 vezes */
-prox(P, D, A) :-
-  prox_1_giro(P, D, P2),
-  prox_1_giro(P2, D, P3),
-  prox_1_giro(P3, D, P4),
-  (\+ pproblema(P4)), A = 'g'.
-
-/* So volta se nao tiver opcao */
-prox(P, D, A) :-
-  prox_1_giro(P, D, P2),
-  prox_1_giro(P2, D, P3),
-  (\+ pproblema(P3)), A = 'g'.
+% todas as opcoes sao ja visitadas ou problematicas, tenta fugir de problema
+% roda um A* para o nao visitado mais proximo
+prox(A) :- A = 'D'.
 
