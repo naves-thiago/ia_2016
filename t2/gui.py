@@ -8,11 +8,16 @@ from prolog import PrologActor
 #sprite_size = (47, 47)
 sprite_size = (50, 50)
 map_size    = (12 * sprite_size[0], 12 * sprite_size[1])
-maps_dist   = 50 # distance between the two maps
-window_size = (2 * map_size[0] + maps_dist, map_size[1])
+maps_dist   = 30 # distance between the two maps
+font_name   = "arial"
+font_size   = 25
+font_color  = (0, 150, 0)
+text_offset = (10, 10)
+bg_color    = (0, 0, 50)
 FPS = 4
 
 ########################
+
 
 class Sprite:
     def __init__(self, img_file, rect=None, scale=(1,1)):
@@ -60,6 +65,8 @@ class Gui:
     def __init__(self, new_frame_cb):
         self.frame_cb = new_frame_cb # Called before each frame to allow application to update the actor / map
         pygame.init()
+        self.font = pygame.font.SysFont(font_name, font_size)
+        window_size = (2 * map_size[0] + maps_dist, map_size[1] + text_offset[1] + self.font.get_height() + 10)
         self.screen = pygame.display.set_mode(window_size)
         pygame.display.set_caption("Respect my authoritah!!")
 
@@ -87,6 +94,7 @@ class Gui:
         self.s_map_actor = pygame.Surface(map_size, pygame.SRCALPHA, 32)
 
         self.set_actor_position((0, 11), "U")
+
 
     def set_actor_position(self, pos, direction):
         ''' Updates both maps with a new actor position and direction. '''
@@ -126,6 +134,15 @@ class Gui:
         sprite.draw(self.screen, full_act_pos)  # Full Map
         sprite.draw(self.screen, act_offset)    # Actor map
 
+    def _draw_text(self):
+        ren  = self.font.render(self.status_text, True, font_color)
+        pos  = (text_offset[0], text_offset[1] + map_size[1])
+        self.screen.blit(ren, pos)
+
+    def set_status(self, txt):
+        ''' Sets the status text. '''
+        self.status_text = txt
+
     def start_draw_loop(self):
         ''' Main update / redraw loop. '''
         # Update the map / actor state
@@ -139,10 +156,12 @@ class Gui:
                     #sys.exit()
                     return
 
+            self.screen.fill(bg_color)
             self.frame_cb()
             self._draw_map_actor()
             self._draw_map_full()
             self._draw_actor()
+            self._draw_text()
             pygame.display.flip()
             clock.tick(FPS)
 

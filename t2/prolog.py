@@ -58,7 +58,7 @@ class PrologActor:
         self.dir = r['X']
 
         # Teste
-        print("Pos: %s\nVida: %d\nPontos: %d\nDir: %s\n" % (str(self.pos), self.vida, self.pontos, self.dir))
+        #print("Pos: %s\nVida: %d\nPontos: %d\nDir: %s\n" % (str(self.pos), self.vida, self.pontos, self.dir))
 
     def _atualiza_mapa(self):
         ''' Atualiza o mapa com o conhecimento do prolog. '''

@@ -7,6 +7,7 @@ def update_map():
     pl.atualiza()
     mapa_ator = pl.mapa
     gui.set_map_actor(mapa_ator)
+    gui.set_status("Pontos: %d   Vida: %d" % (pl.pontos, pl.vida))
 
 def find_unvisited():
     x, y = pl.pos
