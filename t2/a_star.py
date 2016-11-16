@@ -3,25 +3,30 @@ from map_loader import No
 
 class A_star:
     def _vizinhos(self, no):
-        ''' Retorna a lista de vizinhos do no '''
+        ''' Retorna a lista de vizinhos do No. Permite que um No desconhecido (tipo = '?')
+            seja destino, mas nao permite passar por um desconhecido (nao retorna nenhum
+            vizinho de um No desconhecido).'''
+        if no.tipo == "?":
+            return []
+
         res = []
         x, y = no.pos
-        if x > 0 and self.mapa[y][x-1].tipo == ".":
+        if x > 0 and (self.mapa[y][x-1].tipo == "." or self.mapa[y][x-1].tipo == "?"):
             res.append(self.mapa[y][x-1])
 
-        if x < self.max_x and self.mapa[y][x+1].tipo == ".":
+        if x < self.max_x and (self.mapa[y][x+1].tipo == "." or self.mapa[y][x+1].tipo == "?"):
             res.append(self.mapa[y][x+1])
 
-        if y > 0 and self.mapa[y-1][x].tipo == ".":
+        if y > 0 and (self.mapa[y-1][x].tipo == "." or self.mapa[y-1][x].tipo == "?"):
             res.append(self.mapa[y-1][x])
 
-        if y < self.max_y and self.mapa[y+1][x].tipo == ".":
+        if y < self.max_y and (self.mapa[y+1][x].tipo == "." or self.mapa[y+1][x].tipo == "?"):
             res.append(self.mapa[y+1][x])
 
         return res
 
     def _distancia(self, a, b):
-        ''' Calcula a distancia manhattan entre a e b. a e b sao nos. '''
+        ''' Calcula a distancia manhattan entre os Nos a e b. '''
         if a == None or b == None:
             return 0
         return abs(b.pos[0] - a.pos[0]) + abs(b.pos[1] - a.pos[1])
