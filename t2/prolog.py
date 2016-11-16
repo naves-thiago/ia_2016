@@ -62,32 +62,32 @@ class PrologActor:
 
     def _atualiza_mapa(self):
         ''' Atualiza o mapa com o conhecimento do prolog. '''
-        for p in self._query("m_buraco(p(X, Y))"):
+        for p in self._query("buraco(p(X, Y))"):
             x = p['X']
             y = p['Y']
             self._muda_no(x, y, 'P')
 
-        for p in self._query("m_teleport(p(X, Y))"):
+        for p in self._query("teleport(p(X, Y))"):
             x = p['X']
             y = p['Y']
             self._muda_no(x, y, 'T')
 
-        for p in self._query("m_inimigoD(p(X, Y), _)"):
+        for p in self._query("inimigoD(p(X, Y), _)"):
             x = p['X']
             y = p['Y']
             self._muda_no(x, y, 'D')
 
-        for p in self._query("m_inimigod(p(X, Y), _)"):
+        for p in self._query("inimigod(p(X, Y), _)"):
             x = p['X']
             y = p['Y']
             self._muda_no(x, y, 'd')
 
-        for p in self._query("m_powerup(p(X, Y))"):
+        for p in self._query("powerup(p(X, Y))"):
             x = p['X']
             y = p['Y']
             self._muda_no(x, y, 'U')
 
-        for p in self._query("m_ouro(p(X, Y))"):
+        for p in self._query("ouro(p(X, Y))"):
             x = p['X']
             y = p['Y']
             self._muda_no(x, y, 'O')
