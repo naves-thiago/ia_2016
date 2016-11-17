@@ -274,6 +274,8 @@ pegar_ouro :- posicao(P), ouro(P), o_coletados(O), retract(ouro(P)), retract(m_o
 
 pegar_powerup :- posicao(P), powerup(P), p_coletados(O), retract(powerup(P)), retract(m_powerup(P)), retract(p_coletados(O)), O1 is O + 1, assert(p_coletados(O1)), vida(Q), R is Q + 20, retract(vida(Q)), assert(vida(R)), R > 100, S is 100, retract(vida(R)), assert(vida(S)).
 
+sair :- posicao(p(1,1)), pontos(Q), R is Q - 1, retractall(pontos(_)), assert(pontos(R)).
+
 virar :- direcao(D),
 	(
 		(D = 'U', retractall(direcao(_)), assert(direcao('R')));
