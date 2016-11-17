@@ -18,6 +18,8 @@ livre(1, 1).
 livre(2, 1).
 livre(1, 2).
 
+livre(p(X, Y)) :- livre(X, Y).
+
 pinimigo(X) :- inimigoD(X, _); inimigod(X, _).
 pburaco(X) :- buraco(X).
 pteleport(X) :- teleport(X).

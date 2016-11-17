@@ -15,7 +15,7 @@ font_size   = 25
 font_color  = (0, 150, 0)
 text_offset = (10, 10)
 bg_color    = (0, 0, 50)
-FPS         = 4
+FPS         = 3
 
 ########################
 
@@ -93,7 +93,7 @@ class Gui:
 
         self.s_map_full  = pygame.Surface(map_size, pygame.SRCALPHA, 32)
         self.s_map_actor = pygame.Surface(map_size, pygame.SRCALPHA, 32)
-
+        self.path = None
         self.set_actor_position((0, 11), "U")
 
 

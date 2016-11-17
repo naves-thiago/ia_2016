@@ -301,3 +301,75 @@ virar_cima :- retractall(direcao(_)), assert(direcao('U')).
 virar_baixo :- retractall(direcao(_)), assert(direcao('D')).
 virar_direita :- retractall(direcao(_)), assert(direcao('R')).
 virar_esquerda :- retractall(direcao(_)), assert(direcao('L')).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Possivel problema
+pproblema(P) :- pburaco(P); pinimigo(P); pteleport(P); parede(P).
+
+/* P = Posicao atual
+ * D = Direcao atual ('U', 'D', 'R', 'L')
+ * P2 = Proxima posicao
+ */
+prox_mesma_dir(P, D, P2) :- (D = 'U'), norte(P, P2).
+prox_mesma_dir(P, D, P2) :- (D = 'D'), sul(P, P2).
+prox_mesma_dir(P, D, P2) :- (D = 'R'), leste(P, P2).
+prox_mesma_dir(P, D, P2) :- (D = 'L'), oeste(P, P2).
+
+/* P = Posicao atual
+ * D = Direcao atual ('U', 'D', 'R', 'L')
+ * P2 = Proxima posicao
+ */
+prox_1_giro(P, D, P2) :- (D = 'U'), leste(P, P2).
+prox_1_giro(P, D, P2) :- (D = 'D'), oeste(P, P2).
+prox_1_giro(P, D, P2) :- (D = 'R'), sul(P, P2).
+prox_1_giro(P, D, P2) :- (D = 'L'), norte(P, P2).
+
+% D - direcao atual
+% D2 - direcao depois de girar 1 vez
+dir_1_giro(D) :- D = 'U', D2 = 'R'.
+dir_1_giro(D) :- D = 'R', D2 = 'D'.
+dir_1_giro(D) :- D = 'D', D2 = 'L'.
+dir_1_giro(D) :- D = 'L', D2 = 'U'.
+
+/* P = Posicao atual
+ * D = Direcao atual ('U', 'D', 'R', 'L')
+ * A = Acao:
+ * A = 'T' -> atirar
+ * A = 'R' -> rodar pra direita
+ * A = 'A' -> andar pra frente
+ * A = 'P' -> pegar ouro / power up
+ * A = 'S' -> ir para a saida e sair
+ * A = 'D' -> ir para uma posicao desconhecida
+ * A = 'I' -> subir
+*/
+prox(A) :- posicao(P), ouro(P), A = 'P'. /* Se estiver junto do ouro, pega */
+
+% Se ja tiver todos os o_coletados, e esta na saida, sobe
+prox(A) :- o_coletados(3), posicao(p(1,1), A = 'I'.
+
+% Se ja tiver todos os o_coletados, vai pra saida
+prox(A) :- o_coletados(3), A = 'S'.
+
+/* Continua na mesma direcao, a nao ser que ja tenha visitado ou seja problema */
+prox(A) :- posicao(P), direcao(D), prox_mesma_dir(P, D, P2), (\+ pproblema(P2)), (\+ visitado(P2)), A = 'A'.
+
+/* Tenta girando vezes */
+prox(A) :-
+  posicao(P), direcao(D),
+  prox_1_giro(P, D, P2),
+  dir_1_giro(D, D2),
+  prox_1_giro(P2, D2, P3),
+  dir_1_giro(D2, D3)
+  prox_1_giro(P3, D2, P4),
+  (
+    ((\+ pproblema(P2)), (\+ visitado(P2)), A = 'R');
+    ((\+ pproblema(P3)), (\+ visitado(P3)), A = 'R');
+    ((\+ pproblema(P4)), (\+ visitado(P4)), A = 'R')
+  ).
+
+% todas as opcoes sao ja visitadas ou problematicas, tenta fugir de problema
+% roda um A* para o nao visitado mais proximo
+prox(A) :- A = 'D'.
+
+sair :- true.

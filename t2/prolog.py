@@ -5,6 +5,7 @@ class PrologActor:
     def __init__(self, arquivo):
         self.pl = pyswip.Prolog()
         self.pl.consult(arquivo)
+        self._query_single("reset")
 
         # Cria um mapa vazio
         mapa = []
@@ -26,34 +27,18 @@ class PrologActor:
         self.atualiza()
 
     def andar_frente(self):
-        # FIXME
-        if self.dir == "R":
-            self.pos[0] += 1
-        elif self.dir == "L":
-            self.pos[0] -= 1
-        elif self.dir == "U":
-            self.pos[1] -= 1
-        else:
-            self.pos[1] += 1
-
-        print("POS: " + str(self.pos) + "  - " + self.dir)
+        self._query_single("andar")
+        print("POS: " + str(self.pos) + "  - " + self.dir) ### DEBUG
 
     def rodar(self):
-        # FIXME
-        if self.dir == "R":
-            self.dir = "D"
-        elif self.dir == "L":
-            self.dir = "U"
-        elif self.dir == "U":
-            self.dir = "R"
-        else:
-            self.dir = "L"
+        self._query_single("virar")
 
     def pegar_item(self):
         tipo = self.mapa[self.pos[1]][self.pos[0]].tipo
         if tipo == "U":
             self._query_single("pegar_powerup")
         elif tipo == "O":
+            print("Pegar ouro") #### DEBUG
             self._query_single("pegar_ouro")
 
     def atirar(self):
@@ -74,7 +59,13 @@ class PrologActor:
         query = self._query("prox(X)")
         r = next(query)
         query.close()
+        print("ACAO: " + r["X"]) #### DEBUG
         return r["X"]
+
+    def observar(self):
+        ''' Leitura dos sensores... '''
+        self._query_single("observar")
+        self.atualiza()
 
     def _muda_no(self, x, y, tipo):
         ''' Troca o tipo de um No do mapa, convertendo as coordenadas do prolog. '''
@@ -85,7 +76,7 @@ class PrologActor:
 
     def _query(self, qry):
         ''' Faz uma consulta no prolog e imprime a consulta no console. '''
-        #print("Query: " + qry)
+        #print("Query: " + qry) ###
         return self.pl.query(qry)
 
     def _query_single(self, qry):
@@ -134,6 +125,11 @@ class PrologActor:
             y = p['Y']
             self._muda_no(x, y, 'D')
 
+        for p in self._query("livre(p(X, Y))"):
+            x = p['X']
+            y = p['Y']
+            self._muda_no(x, y, '.')
+
         for p in self._query("powerup(p(X, Y))"):
             x = p['X']
             y = p['Y']
@@ -143,9 +139,4 @@ class PrologActor:
             x = p['X']
             y = p['Y']
             self._muda_no(x, y, 'O')
-
-        for p in self._query("livre(X, Y)"):
-            x = p['X']
-            y = p['Y']
-            self._muda_no(x, y, '.')
 
