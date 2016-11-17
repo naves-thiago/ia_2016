@@ -196,7 +196,8 @@ prox_1_giro(P, D, P2) :- (D = 'L'), norte(P, P2).
  * A = 'T' -> atirar
  * A = 'R' -> rodar pra direita
  * A = 'A' -> andar pra frente
- * A = 'P' -> pegar ouro / power up
+ * A = 'P' -> pegar ouro
+ * A = 'U' -> pegar power up
  * A = 'S' -> ir para a saida e sair
  * A = 'D' -> ir para uma posicao desconhecida
  * A = 'I' -> subir
@@ -208,6 +209,9 @@ prox(A) :- ouros(3), A = 'I'.
 
 % Se ja tiver todos os ouros, vai pra saida
 prox(A) :- ouros(3), A = 'S'.
+
+%Se vida < 81 e esta na casa com powerup, pega
+prox(A) :- posicao(P), vida(V), powerup(P), V < 81, A = 'U'.
 
 /* Continua na mesma direcao, a nao ser que ja tenha visitado ou seja problema */
 prox(A) :- posicao(P), direcao(D), prox_mesma_dir(P, D, P2), (\+ pproblema(P2)), (\+ livre(P2)), A = 'A'.
@@ -224,6 +228,16 @@ prox(A) :-
     ((\+ pproblema(P4)), (\+ livre(P4)), A = 'R')
   ).
 
+prox(A) :- balas(B), B > 0, posicao(P), inimigo(P1), adjacente(P, P1), direcao(D),
+	(
+		D = 'U', norte(P, P1);
+		D = 'R', leste(P, P1);
+		D = 'D', sul(P, P1);
+		D = 'L', oeste(P, P1)
+	),
+	A = 'T'.
+	
+	
 % todas as opcoes sao ja visitadas ou problematicas, tenta fugir de problema
 % roda um A* para o nao visitado mais proximo
 prox(A) :- A = 'D'.
