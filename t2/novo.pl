@@ -373,5 +373,3 @@ prox(A) :-
 % todas as opcoes sao ja visitadas ou problematicas, tenta fugir de problema
 % roda um A* para o nao visitado mais proximo
 prox(A) :- A = 'D'.
-
-sair :- true.
