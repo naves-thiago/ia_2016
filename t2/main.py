@@ -45,7 +45,7 @@ def update():
 
 def subir():
     global saiu
-    pl.subir()
+    pl.sair()
     saiu = True
 
 def goto_exit():
@@ -57,7 +57,7 @@ def goto_unvisited():
     global desistiu
 
     no = find_unvisited()
-    print("Goto: " + str(no))  #### DEBUG
+    # print("Goto: " + str(no))  #### DEBUG
     if not no:
         # Se nao consegue ir para mais nenhum lugar, vai pra saida
         goto_exit()

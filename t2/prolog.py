@@ -28,7 +28,7 @@ class PrologActor:
 
     def andar_frente(self):
         self._query_single("andar")
-        print("POS: " + str(self.pos) + "  - " + self.dir) ### DEBUG
+        # print("POS: " + str(self.pos) + "  - " + self.dir) ### DEBUG
 
     def rodar(self):
         self._query_single("virar")
@@ -38,7 +38,7 @@ class PrologActor:
         if tipo == "U":
             self._query_single("pegar_powerup")
         elif tipo == "O":
-            print("Pegar ouro") #### DEBUG
+            # print("Pegar ouro") #### DEBUG
             self._query_single("pegar_ouro")
 
     def atirar(self):
@@ -54,12 +54,16 @@ class PrologActor:
         elif a == "T":
             self.atirar()
 
+    def sair(self):
+        print("Query: sair")
+        self.pl.query("sair")
+
     def melhor_acao(self):
         ''' Consulta qual e a melhor acao a fazer. '''
         query = self._query("prox(X)")
         r = next(query)
         query.close()
-        print("ACAO: " + r["X"]) #### DEBUG
+        # print("ACAO: " + r["X"]) #### DEBUG
         return r["X"]
 
     def observar(self):
@@ -76,11 +80,12 @@ class PrologActor:
 
     def _query(self, qry):
         ''' Faz uma consulta no prolog e imprime a consulta no console. '''
-        #print("Query: " + qry) ###
+        print("Query: " + qry)
         return self.pl.query(qry)
 
     def _query_single(self, qry):
         ''' Faz uma consulta no prolog e le apenas o primeiro resultado. '''
+        print("Query: " + qry)
         query = self._query(qry)
         r = next(query)
         query.close()

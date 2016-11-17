@@ -15,7 +15,7 @@ font_size   = 25
 font_color  = (0, 150, 0)
 text_offset = (10, 10)
 bg_color    = (0, 0, 50)
-FPS         = 3
+FPS         = 4
 
 ########################
 
