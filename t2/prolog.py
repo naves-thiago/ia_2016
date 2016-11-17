@@ -49,12 +49,25 @@ class PrologActor:
         else:
             self.dir = "L"
 
-    def acao(self, a):
-        # TODO completar
+    def pegar_item(self):
+        tipo = self.mapa[self.pos[1]][self.pos[0]].tipo
+        if tipo == "U":
+            self._query_single("pegar_powerup")
+        elif tipo == "O":
+            self._query_single("pegar_ouro")
+
+    def atirar(self):
+        self._query_single("atirar")
+
+    def exec_acao(self, a):
         if a == "A":
             self.andar_frente()
-        else:
+        elif a == "R":
             self.rodar()
+        elif a == "P":
+            self.pegar_item()
+        elif a == "T":
+            self.atirar()
 
     def melhor_acao(self):
         ''' Consulta qual e a melhor acao a fazer. '''

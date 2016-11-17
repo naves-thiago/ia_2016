@@ -14,57 +14,94 @@ from a_star import A_star
 
 navegando = False   # Se true, estamos seguindo o caminho abaixo
 caminho = []        # Caminho gerado pelo A*
-passos_caminho = [] # Sequencia de movimentos para seguir o caminho
-prox_passo = 0      # Proximo indice do passos_caminho
+acoes_caminho = []  # Sequencia de movimentos para seguir o caminho
+prox_acao = 0       # Proximo indice do acoes_caminho
 prox_caminho = 0    # Proximo indice do caminho
+saiu = False        # Saiu da caverna. Para de fazer update()
 
-fim_nav = False
+start_nav = True
 # Chamada do main loop para atualizar o agente e a tela
-def update_map():
-    global navegando, prox_passo, prox_caminho, caminho, passos_caminho, fim_nav
+def update():
+    global navegando, prox_acao, prox_caminho, caminho, acoes_caminho, fim_nav, saiu
+
+    if saiu:
+        return
 
     #### TESTE
-    if navegando and not fim_nav:
-        if prox_passo == len(passos_caminho):
-            fim_nav = True
-            gui.set_path(None, 0)
-            return
-
-        if passos_caminho[prox_passo] == "A":
-            prox_caminho += 1
-            gui.set_path(caminho, prox_caminho)
-            pl.andar_frente()
-        else:
-            pl.rodar()
-
-        prox_passo += 1
-
-    if not navegando and not fim_nav:
-        navegando = True
-        find_path(pl.mapa, pl.mapa[pl.pos[1]][pl.pos[0]], pl.dir, pl.mapa[5][5])
-        gui.set_path(caminho, 0)
+    global start_nav
+    if start_nav:
+        start_nav = False
+        start_navigation(pl.mapa[5][5])
     #######
 
+    if navegando:
+        navigation_step()
+    else:
+        a = pl.melhor_acao()
+        {"T":pl.atirar, "R":pl.rodar, "A":pl.andar_frente, "P":pl.pegar_item, "S":goto_exit, "D":goto_unvisited, "I":subir}[a]()
+
     #pl.atualiza()
-    mapa_ator = pl.mapa
     gui.set_map_actor(mapa_ator)
     gui.set_status("Pontos: %d   Vida: %d   Ouros: %d   Balas: %d" % (pl.pontos, pl.vida, pl.ouros, pl.balas))
     gui.set_actor_position(pl.pos, pl.dir)
 
+def subir():
+    global saiu
+    pl.subir()
+    saiu = True
+
+def goto_exit():
+    ''' Navega para a saida. '''
+    start_navigation(mapa_ator[11][0])
+
+def goto_unvisited():
+    ''' Navega para o No nao visitado mais proximo. '''
+    start_navigation(find_unvisited())
+
+def navigation_step():
+    ''' Executa a proxima acao na navegacao. '''
+    global navegando, prox_acao, acoes_caminho, caminho, prox_caminho
+
+    if prox_acao == len(acoes_caminho):
+        navegando = False
+        gui.set_path(None, 0)
+        return
+
+    if acoes_caminho[prox_acao] == "A":
+        prox_caminho += 1
+        gui.set_path(caminho, prox_caminho)
+        pl.andar_frente()
+    else:
+        pl.rodar()
+
+    prox_acao += 1
+
+
+def start_navigation(dest):
+    ''' Inicia a navegacao por um percurso gerado em uma busca A* da posicao atual ate dest. '''
+    global navegando, prox_acao, prox_caminho, caminho, acoes_caminho
+    navegando = True
+    prox_acao = 0
+    prox_caminho = 0
+    find_path(mapa_ator, mapa_ator[pl.pos[1]][pl.pos[0]], pl.dir, mapa_ator[5][5])
+    gui.set_path(caminho, 0)
+
 def find_path(mapa, ini, dir_ini, fim):
-    global caminho, passos_caminho
+    ''' Encontra um caminho de ini ate fim e atualiza as variaveis globais com o caminho encontrado. '''
+    global caminho, acoes_caminho
     a = A_star(mapa, ini, dir_ini, fim)
     a.run()
 
-    seq, pos = path_to_move_sequence(fim)
+    seq, pos = get_move_sequence(fim)
 
     for p in pos:
         print(str(p))
 
     caminho = pos
-    passos_caminho = seq
+    acoes_caminho = seq
 
 def find_unvisited():
+    ''' Retorna o No nao visitado mais proximo. '''
     x, y = pl.pos
     no_ini = mapa_ator[y][x]
     a = A_star(mapa_ator, no_ini, pl.dir, None)
@@ -85,24 +122,26 @@ def find_unvisited():
 
     return melhor
 
-def path_to_move_sequence(dest):
-    seq = [] # Sequencia de posicoes
-    res = [] # Sequencia de passos (vira, anda...)
+def get_move_sequence(dest):
+    ''' Retorna a sequencia de acoes para chegar a dest e o caminho a percorrer. '''
+    pos   = [] # Sequencia de posicoes
+    steps = [] # Sequencia de acoes (vira, anda...)
     a = dest
     while a:
-        seq.insert(0, a)
+        pos.insert(0, a)
         a = a.anterior
 
-    for i in range(len(seq)-1):
+    for i in range(len(pos)-1):
         # Roda o numero de vezes necessario
-        res.extend(A_star.rotacoes(seq[i], seq[i+1], seq[i].direcao) * ["R"])
-        res.append("A") # Anda pra frente
+        steps.extend(A_star.rotacoes(pos[i], pos[i+1], pos[i].direcao) * ["R"])
+        steps.append("A") # Anda pra frente
 
-    return res, seq
+    return steps, pos
 
 # Ponto de entrada do programa
 map_full = MapLoader("mapa.txt").mapa
 pl = PrologActor("teste.pl")
-gui = Gui(update_map)
+mapa_ator = pl.mapa
+gui = Gui(update)
 gui.set_map_full(map_full)
 gui.start_draw_loop()
