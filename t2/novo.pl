@@ -47,16 +47,16 @@ oeste(p(X, Y), C) :-
   X2 is X - 1, C = p(X2, Y), not(parede(C)).
 
 nordeste(p(X,Y), C) :-
-  norte(p(X,Y), C2), leste(C2, C), not(parede(C)).
+  norte(p(X,Y), C2), leste(C2, C).
 
 noroeste(p(X,Y), C) :-
-  norte(p(X,Y), C2), oeste(C2, C), not(parede(C)).
+  norte(p(X,Y), C2), oeste(C2, C).
 
 sudeste(p(X,Y), C) :-
-  sul(p(X,Y), C2), leste(C2, C), not(parede(C)).
+  sul(p(X,Y), C2), leste(C2, C).
 
 sudoeste(p(X,Y), C) :-
-  sul(p(X,Y), C2), oeste(C2, C), not(parede(C)).
+  sul(p(X,Y), C2), oeste(C2, C).
 
 adjacente(p(X,Y), C) :-
 	norte(p(X,Y), C);
@@ -137,12 +137,12 @@ infere_buraco_adjacente(P,D) :-
 
 limpa_regiao_buraco(B) :-
 	(
-		(adjacente(B, A), retractThis(pburaco(A)), assertThis(nburaco(A)), false);
-		(diagonal(B, D), retractThis(pburaco(D)), assertThis(nburaco(D)), false);
-		(norte(B,N), norte(N,N_N), not(parede(N_N)), retractThis(pburaco(N_N)), assertThis(nburaco(N_N)), false);
-		(sul(B,S), sul(S,S_S), not(parede(S_S)), retractThis(pburaco(S_S)), assertThis(nburaco(S_S)), false);
-		(leste(B,L), leste(L,L_L), not(parede(L_L)), retractThis(pburaco(L_L)), assertThis(nburaco(L_L)), false);
-		(oeste(B,O), oeste(O,O_O), not(parede(O_O)), retractThis(pburaco(O_O)), assertThis(nburaco(O_O)), false);
+		(adjacente(B, A), retractThis(pburaco(A)), assertThis(nburaco(A)), (ninimigo(A)), (nteleport(A)), assertThis(livre(A)), false);
+		(diagonal(B, D), retractThis(pburaco(D)), assertThis(nburaco(D)), (ninimigo(D)), (nteleport(D)), assertThis(livre(D)), false);
+		(norte(B,N), norte(N,N_N), not(parede(N_N)), retractThis(pburaco(N_N)), assertThis(nburaco(N_N)), (ninimigo(N_N)), (nteleport(N_N)), assertThis(livre(N_N)), false);
+		(sul(B,S), sul(S,S_S), not(parede(S_S)), retractThis(pburaco(S_S)), assertThis(nburaco(S_S)), (ninimigo(S_S)), (nteleport(S_S)), assertThis(livre(S_S)), false);
+		(leste(B,L), leste(L,L_L), not(parede(L_L)), retractThis(pburaco(L_L)), assertThis(nburaco(L_L)), (ninimigo(L_L)), (nteleport(L_L)), assertThis(livre(L_L)), false);
+		(oeste(B,O), oeste(O,O_O), not(parede(O_O)), retractThis(pburaco(O_O)), assertThis(nburaco(O_O)), (ninimigo(O_O)), (nteleport(O_O)), assertThis(livre(O_O)), false);
 		true
 	).
 	
@@ -158,12 +158,12 @@ infere_teleport_adjacente(P,D) :-
 
 limpa_regiao_teleport(T) :-
 	(
-		(adjacente(T, A), retractThis(pteleport(A)), assertThis(nteleport(A)), false);
-		(diagonal(T, D), retractThis(pteleport(D)), assertThis(nteleport(D)), false);
-		(norte(T,N), norte(N,N_N), not(parede(N_N)), retractThis(pteleport(N_N)), assertThis(nteleport(N_N)), false);
-		(sul(T,S), sul(S,S_S), not(parede(S_S)), retractThis(pteleport(S_S)), assertThis(nteleport(S_S)), false);
-		(leste(T,L), leste(L,L_L), not(parede(L_L)), retractThis(pteleport(L_L)), assertThis(nteleport(L_L)), false);
-		(oeste(T,O), oeste(O,O_O), not(parede(O_O)), retractThis(pteleport(O_O)), assertThis(nteleport(O_O)), false);
+		(adjacente(T, A), retractThis(pteleport(A)), assertThis(nteleport(A)), (ninimigo(A)), (nburaco(A)), assertThis(livre(A)), false);
+		(diagonal(T, D), retractThis(pteleport(D)), assertThis(nteleport(D)), (ninimigo(D)), (nburaco(D)), assertThis(livre(D)), false);
+		(norte(T,N), norte(N,N_N), not(parede(N_N)), retractThis(pteleport(N_N)), assertThis(nteleport(N_N)), (ninimigo(N_N)), (nburaco(N_N)), assertThis(livre(N_N)), false);
+		(sul(T,S), sul(S,S_S), not(parede(S_S)), retractThis(pteleport(S_S)), assertThis(nteleport(S_S)), (ninimigo(S_S)), (nburaco(S_S)), assertThis(livre(S_S)), false);
+		(leste(T,L), leste(L,L_L), not(parede(L_L)), retractThis(pteleport(L_L)), assertThis(nteleport(L_L)), (ninimigo(L_L)), (nburaco(L_L)), assertThis(livre(L_L)), false);
+		(oeste(T,O), oeste(O,O_O), not(parede(O_O)), retractThis(pteleport(O_O)), assertThis(nteleport(O_O)), (ninimigo(O_O)), (nburaco(O_O)), assertThis(livre(O_O)), false);
 		true
 	).
 	
@@ -179,12 +179,12 @@ infere_inimigo_adjacente(P,D) :-
 
 limpa_regiao_inimigo(I) :-
 	(
-		(adjacente(I, A), retractThis(pinimigo(A)), assertThis(ninimigo(A)), false);
-		(diagonal(I, D), retractThis(pinimigo(D)), assertThis(ninimigo(D)), false);
-		(norte(I,N), norte(N,N_N), not(parede(N_N)), retractThis(pinimigo(N_N)), assertThis(ninimigo(N_N)), false);
-		(sul(I,S), sul(S,S_S), not(parede(S_S)), retractThis(pinimigo(S_S)), assertThis(ninimigo(S_S)), false);
-		(leste(I,L), leste(L,L_L), not(parede(L_L)), retractThis(pinimigo(L_L)), assertThis(ninimigo(L_L)), false);
-		(oeste(I,O), oeste(O,O_O), not(parede(O_O)), retractThis(pinimigo(O_O)), assertThis(ninimigo(O_O)), false);
+		(adjacente(I, A), retractThis(pinimigo(A)), assertThis(ninimigo(A)), (nteleport(A)), (nburaco(A)), assertThis(livre(A)), false);
+		(diagonal(I, D), retractThis(pinimigo(D)), assertThis(ninimigo(D)), (nteleport(D)), (nburaco(D)), assertThis(livre(D)), false);
+		(norte(I,N), norte(N,N_N), not(parede(N_N)), retractThis(pinimigo(N_N)), assertThis(ninimigo(N_N)), (nteleport(N_N)), (nburaco(N_N)), assertThis(livre(N_N)), false);
+		(sul(I,S), sul(S,S_S), not(parede(S_S)), retractThis(pinimigo(S_S)), assertThis(ninimigo(S_S)), (nteleport(S_S)), (nburaco(S_S)), assertThis(livre(S_S)), false);
+		(leste(I,L), leste(L,L_L), not(parede(L_L)), retractThis(pinimigo(L_L)), assertThis(ninimigo(L_L)), (nteleport(L_L)), (nburaco(L_L)), assertThis(livre(L_L)), false);
+		(oeste(I,O), oeste(O,O_O), not(parede(O_O)), retractThis(pinimigo(O_O)), assertThis(ninimigo(O_O)), (nteleport(O_O)), (nburaco(O_O)), assertThis(livre(O_O)), false);
 		true
 	).
 
@@ -209,11 +209,29 @@ observar :- posicao(P), assertThis(visitado(P)),
 		/*se tem brisa e em alguma diagonal tambem, infere buraco na adjacencia correspondente e tira pburaco e poe nburaco em volta*/
 		(brisa(P), diagonal(P, D), brisa(D), infere_buraco_adjacente(P, D), false);
 		
+		/*se tem brisa e no lado oposto tb, infere buraco no meio*/
+		(brisa(P), norte(P,N), norte(N, N_N), brisa(N_N), assertThis(buraco(N)), limpa_regiao_buraco(N), false);
+		(brisa(P), leste(P,L), leste(L, L_L), brisa(L_L), assertThis(buraco(L)), limpa_regiao_buraco(L), false);
+		(brisa(P), oeste(P,O), oeste(O, O_O), brisa(O_O), assertThis(buraco(O)), limpa_regiao_buraco(O), false);
+		(brisa(P), sul(P,S), sul(S, S_S), brisa(S_S), assertThis(buraco(S)), limpa_regiao_buraco(S), false);
+		
 		/*se dois adjacentes tem passos, infere inimigo na diagonal correspondente e tira pinimigo e poe ninimigo em volta*/
 		(passos(P), diagonal(P, D), passos(D), infere_inimigo_adjacente(P, D), false);
 		
+		/*se tem passos e no lado oposto tb, infere inimigo no meio*/
+		(passos(P), norte(P,N), norte(N, N_N), passos(N_N), assertThis(inimigo(N)), limpa_regiao_inimigo(N), false);
+		(passos(P), leste(P,L), leste(L, L_L), passos(L_L), assertThis(inimigo(L)), limpa_regiao_inimigo(L), false);
+		(passos(P), oeste(P,O), oeste(O, O_O), passos(O_O), assertThis(inimigo(O)), limpa_regiao_inimigo(O), false);
+		(passos(P), sul(P,S), sul(S, S_S), passos(S_S), assertThis(inimigo(S)), limpa_regiao_inimigo(S), false);
+		
 		/*se dois adjacentes tem flash, infere teleport na diagonal correspondente e tira pteleport e poe nteleport em volta*/
 		(flash(P), diagonal(P, D), flash(D), infere_teleport_adjacente(P, D), false);
+		
+		/*se tem flash e no lado oposto tb, infere teleporte no meio*/
+		(flash(P), norte(P,N), norte(N, N_N), flash(N_N), assertThis(teleport(N)), limpa_regiao_teleport(N), false);
+		(flash(P), leste(P,L), leste(L, L_L), flash(L_L), assertThis(teleport(L)), limpa_regiao_teleport(L), false);
+		(flash(P), oeste(P,O), oeste(O, O_O), flash(O_O), assertThis(teleport(O)), limpa_regiao_teleport(O), false);
+		(flash(P), sul(P,S), sul(S, S_S), flash(S_S), assertThis(teleport(S)), limpa_regiao_teleport(S), false);
 		
 		/*se A eh nburaco, ninimigo e nteleport tira nCoisa e poe livre(A)*/
 		(nburaco(A), ninimigo(A), nteleport(A), retractThis(nburaco(A)), retractThis(ninimigo(A)), retractThis(nteleport(A)), assertThis(livre(A)), false);
