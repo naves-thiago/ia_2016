@@ -206,6 +206,9 @@ observar :- posicao(P), assertThis(visitado(P)),
 		/*se nao tem nenhum, infere que a posicao e os adjacentes estao livres*/
 		(not(m_flash(P)), not(m_passos(P)), not(m_brisa(P)), adjacente(P, Q), assertThis(livre(P)), retractThis(pburaco(Q)), retractThis(pinimigo(Q)), retractThis(pteleport(Q)), assertThis(livre(Q)), false);
 		
+		/*se dois adjacentes tem brisa, infere buraco na diagonal correspondente e tira pburaco e poe nburaco em volta*/
+		(adjacente(P, P1), brisa(P1), adjacente(P, P2), brisa(P2), diagonal(P1, P2), infere_buraco_adjacente(P1, P2), false);
+		
 		/*se tem brisa e em alguma diagonal tambem, infere buraco na adjacencia correspondente e tira pburaco e poe nburaco em volta*/
 		(brisa(P), diagonal(P, D), brisa(D), infere_buraco_adjacente(P, D), false);
 		
@@ -216,6 +219,9 @@ observar :- posicao(P), assertThis(visitado(P)),
 		(brisa(P), sul(P,S), sul(S, S_S), brisa(S_S), assertThis(buraco(S)), limpa_regiao_buraco(S), false);
 		
 		/*se dois adjacentes tem passos, infere inimigo na diagonal correspondente e tira pinimigo e poe ninimigo em volta*/
+		(adjacente(P, P1), passos(P1), adjacente(P, P2), passos(P2), diagonal(P1, P2), infere_inimigo_adjacente(P1, P2), false);
+		
+		/*se tem passos e em alguma diagonal tambem, infere inimigo na adjacencia correspondente e tira pinimigo e poe nburaco em volta*/
 		(passos(P), diagonal(P, D), passos(D), infere_inimigo_adjacente(P, D), false);
 		
 		/*se tem passos e no lado oposto tb, infere inimigo no meio*/
@@ -225,6 +231,9 @@ observar :- posicao(P), assertThis(visitado(P)),
 		(passos(P), sul(P,S), sul(S, S_S), passos(S_S), assertThis(inimigo(S)), limpa_regiao_inimigo(S), false);
 		
 		/*se dois adjacentes tem flash, infere teleport na diagonal correspondente e tira pteleport e poe nteleport em volta*/
+		(adjacente(P, P1), flash(P1), adjacente(P, P2), flash(P2), diagonal(P1, P2), infere_teleport_adjacente(P1, P2), false);
+		
+		/*se tem flash e em alguma diagonal tambem, infere teleport na adjacencia correspondente e tira pteleport e poe nteleport em volta*/
 		(flash(P), diagonal(P, D), flash(D), infere_teleport_adjacente(P, D), false);
 		
 		/*se tem flash e no lado oposto tb, infere teleporte no meio*/
