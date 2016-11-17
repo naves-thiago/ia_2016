@@ -274,6 +274,24 @@ pegar_ouro :- posicao(P), ouro(P), o_coletados(O), retract(ouro(P)), retract(m_o
 
 pegar_powerup :- posicao(P), powerup(P), p_coletados(O), retract(powerup(P)), retract(m_powerup(P)), retract(p_coletados(O)), O1 is O + 1, assert(p_coletados(O1)), vida(Q), R is Q + 20, retract(vida(Q)), assert(vida(R)), R > 100, S is 100, retract(vida(R)), assert(vida(S)).
 
+virar :- direcao(D),
+	(
+		(D = 'U', retractall(direcao(_)), assert(direcao('R')));
+		(D = 'R', retractall(direcao(_)), assert(direcao('D')));
+		(D = 'D', retractall(direcao(_)), assert(direcao('L')));
+		(D = 'L', retractall(direcao(_)), assert(direcao('U')))
+	),
+	pontos(P), Q is P - 1, retractall(pontos(_)), assert(pontos(Q)).
+	
+andar :- posicao(P), direcao(D),
+	(
+		(D = 'U', norte(P, P1), retractall(posicao(_)), assert(posicao(P1)));
+		(D = 'R', leste(P, P1), retractall(posicao(_)), assert(posicao(P1)));
+		(D = 'D', sul(P, P1), retractall(posicao(_)), assert(posicao(P1)));
+		(D = 'L', oeste(P, P1), retractall(posicao(_)), assert(posicao(P1)))
+	),
+	pontos(Q), R is Q - 1, retractall(pontos(_)), assert(pontos(R)).
+
 /*SOMENTE PARA TESTE! APAGAR DEPOIS!!!*/
 andar_cima :- posicao(p(X,Y)), retractThis(posicao(p(X,Y))), NY is Y + 1, assertThis(posicao(p(X,NY))), observar.
 andar_baixo :- posicao(p(X,Y)), retractThis(posicao(p(X,Y))), NY is Y - 1, assertThis(posicao(p(X,NY))), observar.
