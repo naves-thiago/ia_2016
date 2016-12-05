@@ -1,0 +1,26 @@
+Time taken to build model: 474.57 seconds
+
+=== Stratified cross-validation ===
+=== Summary ===
+
+Correctly Classified Instances       19518               78.072  %
+Incorrectly Classified Instances      5482               21.928  %
+Kappa statistic                          0.5614
+Mean absolute error                      0.2526
+Root mean squared error                  0.4019
+Relative absolute error                 50.5282 %
+Root relative squared error             80.3804 %
+Total Number of Instances            25000     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0,802    0,241    0,769      0,802    0,785      0,562    0,858     0,845     P
+                 0,759    0,198    0,793      0,759    0,776      0,562    0,858     0,861     N
+Weighted Avg.    0,781    0,219    0,781      0,781    0,781      0,562    0,858     0,853     
+
+=== Confusion Matrix ===
+
+     a     b   <-- classified as
+ 10030  2470 |     a = P
+  3012  9488 |     b = N

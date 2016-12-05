@@ -1,0 +1,29 @@
+Time taken to build model: 17.57 seconds
+
+=== Stratified cross-validation ===
+=== Summary ===
+
+Correctly Classified Instances       19412               77.648  %
+Incorrectly Classified Instances      5588               22.352  %
+Kappa statistic                          0.553 
+Mean absolute error                      0.2994
+Root mean squared error                  0.4048
+Relative absolute error                 59.88   %
+Root relative squared error             80.9603 %
+Total Number of Instances            25000     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.797    0.244    0.766      0.797    0.781      0.553    0.836     0.808     P
+                 0.756    0.203    0.788      0.756    0.772      0.553    0.836     0.805     N
+Weighted Avg.    0.776    0.224    0.777      0.776    0.776      0.553    0.836     0.806     
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 9960 2540 |    a = P
+ 3048 9452 |    b = N
+
+
+Dados: frases_correlationAttribute_80.arff

@@ -1,0 +1,32 @@
+LibSVM wrapper, original code by Yasser EL-Manzalawy (= WLSVM)
+
+Time taken to build model: 30.6 seconds
+
+=== Stratified cross-validation ===
+=== Summary ===
+
+Correctly Classified Instances       20182               80.728  %
+Incorrectly Classified Instances      4818               19.272  %
+Kappa statistic                          0.6146
+Mean absolute error                      0.1927
+Root mean squared error                  0.439 
+Relative absolute error                 38.544  %
+Root relative squared error             87.7998 %
+Total Number of Instances            25000     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.862    0.248    0.777      0.862    0.817      0.618    0.807     0.739     P
+                 0.752    0.138    0.845      0.752    0.796      0.618    0.807     0.760     N
+Weighted Avg.    0.807    0.193    0.811      0.807    0.807      0.618    0.807     0.749     
+
+=== Confusion Matrix ===
+
+     a     b   <-- classified as
+ 10780  1720 |     a = P
+  3098  9402 |     b = N
+
+
+Dados: frases_correlationAttribute_80.arff
+Radial basis function
