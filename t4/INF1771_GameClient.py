@@ -228,8 +228,11 @@ class HandleClient:
 
     def __observation(self, s):
         ''' "o" message '''
-        self.lastObservation = s[0]
-        self.ai.observation(s[0])
+        if len(s) > 0 and s[0] != '':
+            self.lastObservation = s[0]
+            self.ai.observation(s[0])
+        else:
+            self.ai.observationClean()
 
     def __connected(self, s):
         ''' "hello" message. Called when any player joins the server '''

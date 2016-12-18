@@ -35,6 +35,10 @@ class AIController:
         ''' Observation result '''
         print("observation", o) # Debug
 
+    def observationClean(self):
+        ''' Observation result was nothing observated '''
+        print("observation clean")
+
     def playerConnected(self, player):
         ''' A player joined the server '''
         print("player joined:", player)
