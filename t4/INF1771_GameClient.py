@@ -272,7 +272,6 @@ class HandleClient:
     def setAIController(self, ai):
         ''' Sets the AI controller instance. This must be called before connect. '''
         self.ai = ai
-        ai.setHandleClient(self)
 
     def connect(self, host):
         ''' Connect to the game server on port 8888 '''
@@ -324,6 +323,6 @@ class HandleClient:
         self._send('name;' + name)
         self.name = name
 
-    def sendColor(self, r, g, b):
-        self._send('color;%d;%d;%d' % (r,g,b))
+    def sendColor(self, rgb):
+        self._send('color;%d;%d;%d' % rgb)
 

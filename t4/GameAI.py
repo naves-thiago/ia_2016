@@ -2,13 +2,8 @@ import random
 
 class AIController:
     def __init__(self):
-        self.server = None # Game Server Handle
         self.gameState = "Disconnected"
         self.time = 0
-
-    def setHandleClient(self, h):
-        ''' Should only be called from within HandleClient. '''
-        server = h
 
     def gameStatus(self, status, time):
         ''' Game status was updated '''

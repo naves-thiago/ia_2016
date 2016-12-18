@@ -4,7 +4,8 @@ import threading
 import time
 
 class GameBot(threading.Thread):
-    def __init__(self):
+    def __init__(self, name=None, color=None):
+        ''' Create bot. name = string, color = tuple (R[0-255], G[0-255], B[0-255]) '''
         super().__init__()
         self.alive = threading.Event()
         self.alive.set()
@@ -25,6 +26,12 @@ class GameBot(threading.Thread):
 
         #self.game.connect("127.0.0.1")
         self.game.connect("atari.icad.puc-rio.br")
+        if name:
+            self.game.sendName(name)
+
+        if color:
+            self.game.sendColor(color)
+
         self.start()
 
     def __disconnectCB(self):
