@@ -1,8 +1,12 @@
 import random
+from a_star import A_star
+from mapa import Mapa
 
 class AIController:
     def __init__(self):
+        self.mapa = Mapa()
         self.gameState = "Disconnected"
+        self.ultima_observacao = []
         self.time = 0
 
     def gameStatus(self, status, time):
@@ -16,18 +20,36 @@ class AIController:
         ''' Score Board was updated '''
         print("score board update")
 
+    _convert_dir = {"north" : 'U', 'east' : 'R', 'south' : 'D', 'west' : 'L'}
     def playerStatus(self, pos, direction, state, score, health):
         ''' Our status was updated '''
         self.pos = pos
-        self.direction = direction
+        self.direction = _convert_dir[direction]
         self.state = state
         self.score = score
         self.health = health
 
         print("player status:", pos, direction, state, score, health) # Debug
 
+    def nextPosition(self):
+        ''' Retorna o No na posicao na frente da atual '''
+        p = [x for x in self.pos] # Copia a posicao atual
+        if self.direction == 'U':
+            p[1] -= 1
+        elif self.direction == 'D':
+            p[1] += 1
+        elif self.direction == 'L':
+            p[0] -= 1
+        else
+            p[0] += 1
+
+        return self.mapa.get(p[0], p[1])
+
     def observation(self, o):
         ''' Observation result '''
+
+        self.ultima_observacao = o
+
         for obs in o:
             print("observation", obs) # Debug
 
@@ -44,15 +66,15 @@ class AIController:
                 pass
 
             elif (obs == "blueLight"):
+                # Tesouro
                 pass
 
             elif (obs == "redLight"):
-                pass
-
-            elif (obs == "greenLight"):
+                # Power-up
                 pass
 
             elif (obs == "weakLight"):
+                # Indefinido. (acho que nao tem)
                 pass
 
     def observationClean(self):
