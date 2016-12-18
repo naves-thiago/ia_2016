@@ -28,7 +28,8 @@ class AIController:
 
     def observation(self, o):
         ''' Observation result '''
-        print("observation", o) # Debug
+        for obs in o:
+            print("observation", obs) # Debug
 
     def observationClean(self):
         ''' Observation result was nothing observated '''

@@ -229,8 +229,8 @@ class HandleClient:
     def __observation(self, s):
         ''' "o" message '''
         if len(s) > 0 and s[0] != '':
-            self.lastObservation = s[0]
-            self.ai.observation(s[0])
+            self.lastObservation = s
+            self.ai.observation(s)
         else:
             self.ai.observationClean()
 
