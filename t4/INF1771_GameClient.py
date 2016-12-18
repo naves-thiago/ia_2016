@@ -21,21 +21,28 @@ Comandos do servidor:
 from socket import socket
 import threading
 import queue
+from weakref import WeakMethod
 
 class StringSocket(threading.Thread):
+    ''' Threaded socket connection that expects to receive lines ending in \\n. Has send and receive queues for buffering and thread synchronization '''
     def __init__(self, closeCallback=None):
         super().__init__()
-        self.closeCallback = closeCallback
-        self.buff_len = 100
-        self.timeout  = 0.1
+        if closeCallback:
+            # Weak reference to avoid a circular reference messing with __del__()
+            self.closeCallback = WeakMethod(closeCallback)
+        else:
+            self.closeCallback = None
+        self.buff_len = 100 # receive from socket buffer size
+        self.timeout  = 0.1 # get from send_queue timeout. Limits CPU usage
         self.socket = socket()
         self.alive = threading.Event()
         self.alive.clear()
         self.send_queue = queue.Queue()
         self.recv_queue = queue.Queue()
-        self.msg = ""
+        self.msg = ""  # Partially received message
 
     def run(self):
+        ''' Thread entry point (called by start() in connect() '''
         self.alive.wait() # Wait for a connection
 
         while self.alive.is_set():
@@ -44,8 +51,8 @@ class StringSocket(threading.Thread):
                 if len(r) == 0:
                     self.alive.clear()
                     self.socket.close()
-                    if self.closeCallback:
-                        self.closeCallback()
+                    if self.closeCallback and self.closeCallback():
+                        self.closeCallback()()
 
                     return
 
@@ -64,27 +71,35 @@ class StringSocket(threading.Thread):
         self.close()
 
     def connect(self, host):
+        ''' Connects to the host (tuple (hostname / ip, port)) and starts the thread '''
         self.socket.connect(host)
         self.socket.setblocking(0)
         self.alive.set() # Start thread loop
         self.start()
 
     def close(self):
-        self.alive.clear()
-        if self.is_alive():
-            self.join() # Wait thread termination
+        ''' Stops the thread and closes the socket '''
+        self.alive.clear()  # Request thread termination
+        if self.is_alive(): # Test if the thread is running
+            self.join()     # Wait thread termination
         self.socket.close()
 
     def send(self, s):
+        ''' Queue data to send '''
         self.send_queue.put(s)
 
     def recv(self, timeout=None):
+        ''' Read from the receive queue with optional timeout '''
         try:
-            return self.recv_queue.get(True, timeout)
+            if timeout == 0:
+                return self.recv_queue.get(False)
+            else:
+                return self.recv_queue.get(True, timeout)
         except:
             return None
 
     def __parse(self, s):
+        ''' Split data on \\n and join partial messages '''
         # Join with last reception (in case it was partial)
         tmp = self.msg + s
 
@@ -100,18 +115,25 @@ class StringSocket(threading.Thread):
             self.recv_queue.put(m)
 
     def __send(self, s):
+        ''' Convert string to bytes and send them '''
         self.socket.send(bytes(s, 'utf-8'))
 
     def __recv(self):
+        ''' Convert received bytes to string '''
         return self.socket.recv(self.buff_len).decode('utf-8')
 
 
 class HandleClient:
-    def __init__(self):
+    ''' INF1771 Game Client class '''
+    def __init__(self, disconnectListener = None):
+        if disconnectListener:
+            self.disconnectListener = WeakMethod(disconnectListener)
+        else:
+            self.disconnectListener = None
         self.socket = StringSocket()
         self.ai = None # AIController instance
-        self.connected = False
-        self.interval = 1
+        self.connected = threading.Event()
+        self.connected.clear()
         self.players = {}
         self.gameState = "Disconnected"
         self.lastHitBy = None
@@ -139,15 +161,24 @@ class HandleClient:
         self.sendGoodbye()
 
     def __connectionClosedCallback(self):
-        self.connected = False
+        self.connected.clear()
+        if self.disconnectListener:
+            cb = self.disconnectListener()
+            if cb:
+                cb()
         self.ai.gameStatus("Disconnected", self.time)
 
     def _send(self, s):
         self.socket.send(s+'\n')
 
-    def __recv(self):
-        ''' Requests a message from the socket '''
-        self.__parse(self.socket.recv())
+    def recv(self, timeout=None):
+        ''' Requests a message from the socket. Return True on success, False on timeout '''
+        m = self.socket.recv(timeout)
+        if m:
+            self.__parse(m)
+            return True
+        else:
+            return False
 
     def __parse(self, s):
         ''' Parse server message and update state '''
@@ -246,9 +277,7 @@ class HandleClient:
             raise Exception("AI Controller not set.")
 
         self.socket.connect((host, 8888))
-        self.connected = True
-        while True:
-            self.__recv()
+        self.connected.set()
 
     def sendForward(self):
         self._send('w')
@@ -285,6 +314,7 @@ class HandleClient:
 
     def sendGoodbye(self):
         self._send('quit')
+        self.connected.clear()
         self.socket.close()
 
     def sendName(self, name):
@@ -294,69 +324,3 @@ class HandleClient:
     def sendColor(self, r, g, b):
         self._send('color;%d;%d;%d' % (r,g,b))
 
-class AIController:
-    def __init__(self):
-        self.server = None # Game Server Handle
-        self.gameState = "Disconnected"
-        self.time = 0
-
-    def setHandleClient(self, h):
-        ''' Should only be called from within HandleClient. '''
-        server = h
-
-    def gameStatus(self, status, time):
-        ''' Game status was updated '''
-        self.gameState = status
-        self.time = time
-
-        print("game status", status, time)
-
-    def scoreBoard(self, players):
-        ''' Score Board was updated '''
-        print("score board update")
-
-    def playerStatus(self, pos, direction, state, score, health):
-        ''' Our status was updated '''
-        self.pos = pos
-        self.direction = direction
-        self.state = state
-        self.score = score
-        self.health = health
-
-        print("player status:", pos, direction, state, score, health) # Debug
-
-    def observation(self, o):
-        ''' Observation result '''
-        print("observation", o) # Debug
-
-    def playerConnected(self, player):
-        ''' A player joined the server '''
-        print("player joined:", player)
-
-    def takeDamage(self, shooter):
-        ''' We got hit '''
-        print("got hit by:", shooter)
-
-    def hitPlayer(self, target):
-        ''' We hit another player '''
-        print("hit:", target)
-
-    def playerQuit(self, player):
-        ''' A player quit the server '''
-        print("player quit:", player)
-
-    def playerRename(self, oldName, newName):
-        ''' A player changed the name '''
-        print("player rename:", oldName, newName)
-
-    def chat(self, message):
-        ''' A chat message was received '''
-        print("chat", message)
-
-def main():
-    ai = AIController()
-    g = HandleClient()
-    g.setAIController(ai)
-    g.connect("127.0.0.1")
-
-main()
