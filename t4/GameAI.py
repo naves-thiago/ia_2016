@@ -31,6 +31,30 @@ class AIController:
         for obs in o:
             print("observation", obs) # Debug
 
+            if (obs == "blocked"):
+                pass
+
+            elif (obs == "steps"):
+                pass
+
+            elif (obs == "breeze"):
+                pass
+
+            elif (obs == "flash"):
+                pass
+
+            elif (obs == "blueLight"):
+                pass
+
+            elif (obs == "redLight"):
+                pass
+
+            elif (obs == "greenLight"):
+                pass
+
+            elif (obs == "weakLight"):
+                pass
+
     def observationClean(self):
         ''' Observation result was nothing observated '''
         print("observation clean")
