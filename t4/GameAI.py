@@ -16,7 +16,7 @@ class AIController:
         self.gameState = "Disconnected"
         self.ultima_observacao = []
         self.time = 0
-        self.proxAcao = Acoes.DIREITA
+        self.proxAcao = Acoes.FRENTE
 
     def gameStatus(self, status, time):
         ''' Game status was updated '''
@@ -108,7 +108,11 @@ class AIController:
 
     def observationClean(self):
         ''' Observation result was nothing observated '''
-        print("observation clean")
+        atual = self.mapa.get(self.pos[0], self.pos[1])
+        adj = self.mapa.adjacentes(atual)
+        self.mapa.flagLivre(atual)
+        for n in adj:
+            self.mapa.flagLivre(n)
 
     def playerConnected(self, player):
         ''' A player joined the server '''

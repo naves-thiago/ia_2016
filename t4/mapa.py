@@ -25,12 +25,13 @@ class No:
             return False
 
 class TileType:
-    UNKOWN   = 0;
-    GOLD     = 1;
-    POWEUP   = 2;
-    TELEPORT = 3;
-    PIT      = 4;
-    WALL     = 5;
+    UNKOWN   = 0
+    GOLD     = 1
+    POWEUP   = 2
+    TELEPORT = 3
+    PIT      = 4
+    WALL     = 5
+    FREE     = 6
 
 class Mapa:
     size = (59, 34)
@@ -109,3 +110,14 @@ class Mapa:
         except:
             pass
 
+    def flagLivre(self, n):
+        n.tipo = TileType.FREE
+        try:
+            self.pburaco.remove(n)
+        except:
+            pass
+
+        try:
+            self.pteleport.remove(n)
+        except:
+            pass
