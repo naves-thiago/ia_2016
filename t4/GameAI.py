@@ -2,12 +2,21 @@ import random
 from a_star import A_star
 from mapa import Mapa
 
+class Acoes:
+    PEGAR    = 0
+    FRENTE   = 1
+    ATRAS    = 2
+    DIREITA  = 3
+    ESQUERDA = 4
+    ATIRAR   = 5
+
 class AIController:
     def __init__(self):
         self.mapa = Mapa()
         self.gameState = "Disconnected"
         self.ultima_observacao = []
         self.time = 0
+        self.proxAcao = Acoes.DIREITA
 
     def gameStatus(self, status, time):
         ''' Game status was updated '''
@@ -24,24 +33,24 @@ class AIController:
     def playerStatus(self, pos, direction, state, score, health):
         ''' Our status was updated '''
         self.pos = pos
-        self.direction = _convert_dir[direction]
+        self.direction = AIController._convert_dir[direction]
         self.state = state
         self.score = score
         self.health = health
 
         print("player status:", pos, direction, state, score, health) # Debug
 
-    def nextPosition(self):
-        ''' Retorna o No na posicao na frente da atual '''
+    def nextPosition(self, dist=1):
+        ''' Retorna o No dist posicoes na frente da atual '''
         p = [x for x in self.pos] # Copia a posicao atual
         if self.direction == 'U':
-            p[1] -= 1
+            p[1] -= dist
         elif self.direction == 'D':
-            p[1] += 1
+            p[1] += dist
         elif self.direction == 'L':
-            p[0] -= 1
-        else
-            p[0] += 1
+            p[0] -= dist
+        else:
+            p[0] += dist
 
         return self.mapa.get(p[0], p[1])
 
@@ -53,29 +62,49 @@ class AIController:
         for obs in o:
             print("observation", obs) # Debug
 
-            if (obs == "blocked"):
+            if obs == "blocked":
+                p = self.nextPosition()
+                n = self.mapa.get(p[0], p[1])
+                n.tipo = TileType.WALL
+
+            elif obs == "steps":
                 pass
 
-            elif (obs == "steps"):
-                pass
+            elif obs == "breeze":
+                adj = self.mapa.adjacentes(self.pos)
+                for n in adj:
+                    self.mapa.flagPBuraco(n)
 
-            elif (obs == "breeze"):
-                pass
+            elif obs == "flash":
+                adj = self.mapa.adjacentes(self.pos)
+                for n in adj:
+                    self.mapa.flagPTeleport(n)
 
-            elif (obs == "flash"):
-                pass
-
-            elif (obs == "blueLight"):
+            elif obs == "blueLight":
                 # Tesouro
-                pass
+                n = self.mapa.get(self.pos[0], self.pos[1])
+                n.tipo = TileType.GOLD
+                if not n in self.mapa.ouros:
+                    self.mapa.ouros.append(n)
 
-            elif (obs == "redLight"):
+                self.proxAcao = Acoes.PEGAR
+
+            elif obs == "redLight":
                 # Power-up
-                pass
+                n = self.mapa.get(self.pos[0], self.pos[1])
+                n.tipo = TileType.GOLD
+                if not n in self.mapa.ouros:
+                    self.mapa.ouros.append(n)
 
-            elif (obs == "weakLight"):
+                # Acao ?
+
+            elif obs == "weakLight":
                 # Indefinido. (acho que nao tem)
                 pass
+
+            elif a[:5] == "enemy":
+                dist = int(a[6:])
+                self.proxAcao = Acoes.ATIRAR
 
     def observationClean(self):
         ''' Observation result was nothing observated '''
@@ -107,14 +136,12 @@ class AIController:
 
     def getDecision(self):
         ''' Return the next action '''
-        action = ("virar_direita",
-                  "virar_esquerda",
+        action = ("pegar_ouro",
                   "andar",
-                  "atacar",
-                  "pegar_ouro",
-                  "pegar_anel",
-                  "pegar_powerup",
-                  "andar_re")
+                  "andar_re",
+                  "virar_direita",
+                  "virar_esquerda",
+                  "atacar")
 
-        return action[random.randint(0,7)]
+        return action[self.proxAcao]
 

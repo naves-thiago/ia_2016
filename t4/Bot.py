@@ -54,7 +54,7 @@ class GameBot(threading.Thread):
     def doDecision(self):
         ''' Ask AI for the next action '''
         a = self.ai.getDecision()
-        print("Decision: "+a)
+        print("Decision: "+a) # Debug / requisito
         self.actions[a]()
         self.game.sendRequestUserStatus()
         self.game.sendRequestObservation()
