@@ -25,6 +25,7 @@ class AIController:
         self.time = 0
         self.acoes = [Acoes.FRENTE]
         self.objetivo = Objetivos.EXPLORAR
+        self.ready = False
         #self.direction = 'U'
         #self.pos = (3,3) # gambiarra (nao sabemos nossa pos na primeira iteracao)
 
@@ -78,6 +79,9 @@ class AIController:
             # Converte o formato da sequencia retornada pelo A*
             print(seq)
             self.acoes = []
+            if len(seq) == 0:
+                return
+
             for s in seq:
                 self.acoes.append(AIController.__convertePasso[s])
 
@@ -126,6 +130,11 @@ class AIController:
 
                 self.acoes.insert(0, Acoes.PEGAR)
 
+                if not "breeze" in o and not "flash" in o:
+                    adj = self.mapa.adjacentes(self.pos)
+                    for n in adj:
+                        self.mapa.flagSafe(n)
+
             elif obs == "redLight":
                 # Power-up
                 n = self.mapa.get(self.pos[0], self.pos[1])
@@ -147,7 +156,13 @@ class AIController:
         if len(self.acoes) == 0:
             self.explorar()
 
+        if len(self.acoes) == 0:
+            print("Sem acoes")
+            self.acoes = [Acoes.DIREITA, Acoes.DIREITA, Acoes.ANDAR]
+
         self.mapa.printMap()
+
+        self.ready = True
 
     def observationClean(self):
         ''' Observation result was nothing observated '''
@@ -160,7 +175,13 @@ class AIController:
         if len(self.acoes) == 0:
             self.explorar()
 
+        if len(self.acoes) == 0:
+            print("Sem acoes")
+            self.acoes = [Acoes.DIREITA, Acoes.DIREITA, Acoes.ANDAR]
+
         self.mapa.printMap()
+
+        self.ready = True
 
     def playerConnected(self, player):
         ''' A player joined the server '''
@@ -188,6 +209,11 @@ class AIController:
 
     def getDecision(self):
         ''' Return the next action '''
+        if not self.ready:
+            return ""
+
+        self.ready = False
+
         action = ("pegar_ouro",
                   "andar",
                   "andar_re",

@@ -9,7 +9,7 @@ class GameBot(threading.Thread):
         super().__init__()
         self.alive = threading.Event()
         self.alive.set()
-        self.interval = 0.5
+        self.interval = 0.3
         self.ai = AIController()
         self.game = HandleClient(self.__disconnectCB)
         self.game.setAIController(self.ai)
@@ -25,7 +25,8 @@ class GameBot(threading.Thread):
                        }
 
         #self.game.connect("127.0.0.1")
-        self.game.connect("atari.icad.puc-rio.br")
+        #self.game.connect("atari.icad.puc-rio.br")
+        self.game.connect("139.82.2.67")
         if name:
             self.game.sendName(name)
 
@@ -46,7 +47,7 @@ class GameBot(threading.Thread):
             while self.game.recv(0):
                 pass
 
-            if self.game.gameState == "Game":
+            if self.game.gameState == "Game" and self.game.state == "game":
                 self.doDecision()
 
             time.sleep(self.interval)
@@ -54,7 +55,6 @@ class GameBot(threading.Thread):
     def doDecision(self):
         ''' Ask AI for the next action '''
         self.game.sendRequestUserStatus()
-        self.game.sendRequestObservation()
 
         a = self.ai.getDecision()
         print("Decision: "+a) # Debug / requisito
@@ -64,6 +64,8 @@ class GameBot(threading.Thread):
             f()
         else:
             print("Acao invalida")
+
+        self.game.sendRequestObservation()
 
     def close(self):
         self.alive.clear()

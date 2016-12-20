@@ -12,16 +12,16 @@ class A_star:
 
         res = []
         x, y = no.pos
-        if x > 0 and (self.mapa[y][x-1].tipo == TileType.FREE or self.mapa[y][x-1].tipo == TileType.SAFE):
+        if x > 0 and (self.mapa[y][x-1].tipo in (TileType.FREE, TileType.SAFE, TileType.GOLD, TileType.POWERUP)):
             res.append(self.mapa[y][x-1])
 
-        if x < self.max_x and (self.mapa[y][x+1].tipo == TileType.FREE or self.mapa[y][x+1].tipo == TileType.SAFE):
+        if x < self.max_x and (self.mapa[y][x+1].tipo in (TileType.FREE, TileType.SAFE, TileType.GOLD, TileType.POWERUP)):
             res.append(self.mapa[y][x+1])
 
-        if y > 0 and (self.mapa[y-1][x].tipo == TileType.FREE or self.mapa[y-1][x].tipo == TileType.SAFE):
+        if y > 0 and (self.mapa[y-1][x].tipo == TileType.FREE in (TileType.FREE, TileType.SAFE, TileType.GOLD, TileType.POWERUP)):
             res.append(self.mapa[y-1][x])
 
-        if y < self.max_y and (self.mapa[y+1][x].tipo == TileType.FREE or self.mapa[y+1][x].tipo == TileType.SAFE):
+        if y < self.max_y and (self.mapa[y+1][x].tipo == TileType.FREE in (TileType.FREE, TileType.SAFE, TileType.GOLD, TileType.POWERUP)):
             res.append(self.mapa[y+1][x])
 
         return res
@@ -173,7 +173,7 @@ class A_star:
             if c.custo_acumulado < melhor.custo_acumulado:
                 melhor = c
 
-        print("A* ---- > "+str(melhor))
+        print("A* ---- > "+str(melhor)+" -- Custo %d" % melhor.custo_acumulado)
         return melhor
 
     def __stepsDest(self, dest):

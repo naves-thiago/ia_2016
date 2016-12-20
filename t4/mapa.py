@@ -28,7 +28,7 @@ class No:
 class TileType:
     UNKNOWN  = 0
     GOLD     = 1
-    POWEUP   = 2
+    POWERUP  = 2
     TELEPORT = 3
     PIT      = 4
     WALL     = 5
@@ -149,7 +149,7 @@ class Mapa:
     __str_tipo = {
                    TileType.UNKNOWN  : "_",
                    TileType.GOLD     : "G",
-                   TileType.POWEUP   : "U",
+                   TileType.POWERUP  : "U",
                    TileType.TELEPORT : "T",
                    TileType.PIT      : "P",
                    TileType.WALL     : "W",
