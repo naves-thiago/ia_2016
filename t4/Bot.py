@@ -49,6 +49,8 @@ class GameBot(threading.Thread):
 
             if self.game.gameState == "Game" and self.game.state == "game":
                 self.doDecision()
+            else:
+                time.sleep(3*self.interval)
 
             time.sleep(self.interval)
 

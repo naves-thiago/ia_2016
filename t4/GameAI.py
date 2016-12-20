@@ -79,7 +79,7 @@ class AIController:
             # Converte o formato da sequencia retornada pelo A*
             print(seq)
             self.acoes = []
-            if len(seq) == 0:
+            if not seq or len(seq) == 0:
                 return
 
             for s in seq:
@@ -169,7 +169,7 @@ class AIController:
 
         if len(self.acoes) == 0:
             print("Sem acoes")
-            self.acoes = [Acoes.DIREITA, Acoes.DIREITA, Acoes.ANDAR]
+            self.acoes = [Acoes.DIREITA, Acoes.DIREITA, Acoes.FRENTE]
 
         self.mapa.printMap()
 
@@ -188,7 +188,7 @@ class AIController:
 
         if len(self.acoes) == 0:
             print("Sem acoes")
-            self.acoes = [Acoes.DIREITA, Acoes.DIREITA, Acoes.ANDAR]
+            self.acoes = [Acoes.DIREITA, Acoes.DIREITA, Acoes.FRENTE]
 
         self.mapa.printMap()
 

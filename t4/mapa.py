@@ -65,6 +65,7 @@ class Mapa:
             p = p.pos
 
         a = [(p[0]-1, p[1]), (p[0]+1, p[1]), (p[0], p[1]-1), (p[0], p[1]+1)]
+        #a.reverse() # Martelada
         res = []
         for x,y in a:
             n = self.get(x, y)
@@ -101,10 +102,10 @@ class Mapa:
 
     def flagParede(self, n):
         n.tipo = TileType.WALL
-        try:
-            self.pburaco.remove(n)
-        except:
-            pass
+        #try:
+        #    self.pburaco.remove(n)
+        #except:
+        #    pass
 
         try:
             self.pteleport.remove(n)
@@ -113,10 +114,10 @@ class Mapa:
 
     def flagLivre(self, n):
         n.tipo = TileType.FREE
-        try:
-            self.pburaco.remove(n)
-        except:
-            pass
+        #try:
+        #    self.pburaco.remove(n)
+        #except:
+        #    pass
 
         try:
             self.pteleport.remove(n)
@@ -127,11 +128,11 @@ class Mapa:
         if n.tipo != TileType.UNKNOWN:
             return
 
-        n.tipo = TileType.SAFE
-        try:
-            self.pburaco.remove(n)
-        except:
-            pass
+        #n.tipo = TileType.SAFE
+        #try:
+        #    self.pburaco.remove(n)
+        #except:
+        #    pass
 
         try:
             self.pteleport.remove(n)
