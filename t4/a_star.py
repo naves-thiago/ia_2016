@@ -1,3 +1,4 @@
+import sys
 import heapq
 from mapa import No, TileType
 
@@ -11,16 +12,16 @@ class A_star:
 
         res = []
         x, y = no.pos
-        if x > 0 and (self.mapa[y][x-1].tipo == TileType.FREE or self.mapa[y][x-1].tipo == TileType.UNKNOWN):
+        if x > 0 and (self.mapa[y][x-1].tipo == TileType.FREE or self.mapa[y][x-1].tipo == TileType.SAFE):
             res.append(self.mapa[y][x-1])
 
-        if x < self.max_x and (self.mapa[y][x+1].tipo == TileType.FREE or self.mapa[y][x+1].tipo == TileType.UNKNOWN):
+        if x < self.max_x and (self.mapa[y][x+1].tipo == TileType.FREE or self.mapa[y][x+1].tipo == TileType.SAFE):
             res.append(self.mapa[y][x+1])
 
-        if y > 0 and (self.mapa[y-1][x].tipo == TileType.FREE or self.mapa[y-1][x].tipo == TileType.UNKNOWN):
+        if y > 0 and (self.mapa[y-1][x].tipo == TileType.FREE or self.mapa[y-1][x].tipo == TileType.SAFE):
             res.append(self.mapa[y-1][x])
 
-        if y < self.max_y and (self.mapa[y+1][x].tipo == TileType.FREE or self.mapa[y+1][x].tipo == TileType.UNKNOWN):
+        if y < self.max_y and (self.mapa[y+1][x].tipo == TileType.FREE or self.mapa[y+1][x].tipo == TileType.SAFE):
             res.append(self.mapa[y+1][x])
 
         return res
@@ -87,6 +88,7 @@ class A_star:
             rotacoes(orig, dest, direcao) -> tupla de rotacoes. '''
 
         r = A_star.rotacoesHora(orig, dest, direcao)
+        print("Rotacao: %d" % r)
         return ((), ('R'), ('R', 'R'), ('L'))[r]  # 3 rotacoes a direita = 1 a esquerda
 
     def __init__(self, mapa, no_ini, dir_ini, no_fim):
@@ -159,7 +161,7 @@ class A_star:
         candidatos = []
         for y in self.mapa:
             for x in y:
-                if x.tipo == TileType.UNKNOWN and x.custo_acumulado != None:
+                if x.tipo == TileType.SAFE and x.custo_acumulado != None:
                     candidatos.append(x)
 
         # Econtra o No mais proximo entre os candidatos
@@ -171,6 +173,7 @@ class A_star:
             if c.custo_acumulado < melhor.custo_acumulado:
                 melhor = c
 
+        print("A* ---- > "+str(melhor))
         return melhor
 
     def __stepsDest(self, dest):
@@ -183,6 +186,11 @@ class A_star:
             if a == self.no_ini:
                 break
             a = a.anterior
+
+        # DEBUG
+        for n in pos:
+            sys.stdout.write(str(n)+" ")
+        print("")
 
         for i in range(len(pos)-1):
             # Roda o numero de vezes necessario

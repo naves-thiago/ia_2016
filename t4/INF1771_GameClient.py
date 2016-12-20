@@ -33,7 +33,7 @@ class StringSocket(threading.Thread):
         else:
             self.closeCallback = None
         self.buff_len = 100 # receive from socket buffer size
-        self.timeout  = 0.1 # get from send_queue timeout. Limits CPU usage
+        self.timeout  = 0.05 # get from send_queue timeout. Limits CPU usage
         self.socket = socket()
         self.alive = threading.Event()
         self.alive.clear()

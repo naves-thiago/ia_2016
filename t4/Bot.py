@@ -53,14 +53,17 @@ class GameBot(threading.Thread):
 
     def doDecision(self):
         ''' Ask AI for the next action '''
+        self.game.sendRequestUserStatus()
+        self.game.sendRequestObservation()
+
         a = self.ai.getDecision()
         print("Decision: "+a) # Debug / requisito
 
         f = self.actions.get(a)
         if f:
             f()
-        self.game.sendRequestUserStatus()
-        self.game.sendRequestObservation()
+        else:
+            print("Acao invalida")
 
     def close(self):
         self.alive.clear()

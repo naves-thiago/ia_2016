@@ -67,7 +67,7 @@ class AIController:
     __convertePasso = {'F' : Acoes.FRENTE, 'R' : Acoes.DIREITA, 'L' : Acoes.ESQUERDA}
     def explorar(self):
         prox = self.nextPosition()
-        if prox and prox.tipo == TileType.UNKNOWN:
+        if prox and self.mapa.isSafe(prox):
             self.acoes = [Acoes.FRENTE]
         else:
             # A* para o desconhecido mais proximo
@@ -76,6 +76,7 @@ class AIController:
             seq = a.run() # Sequencia de passos
 
             # Converte o formato da sequencia retornada pelo A*
+            print(seq)
             self.acoes = []
             for s in seq:
                 self.acoes.append(AIController.__convertePasso[s])
@@ -96,7 +97,8 @@ class AIController:
             if obs == "blocked":
                 # Por agora considerando que so andamos para frente
                 n = self.nextPosition()
-                self.mapa.flagParede(n)
+                if n:
+                    self.mapa.flagParede(n)
 
                 # Procura um novo caminho para o objetivo
                 # TODO testar qual eh o objetivo
@@ -141,13 +143,24 @@ class AIController:
                 dist = int(obs[6:])
                 self.acoes.insert(0, Acoes.ATIRAR)
 
+
+        if len(self.acoes) == 0:
+            self.explorar()
+
+        self.mapa.printMap()
+
     def observationClean(self):
         ''' Observation result was nothing observated '''
         atual = self.mapa.get(self.pos[0], self.pos[1])
         adj = self.mapa.adjacentes(atual)
         self.mapa.flagLivre(atual)
         for n in adj:
-            self.mapa.flagLivre(n)
+            self.mapa.flagSafe(n)
+
+        if len(self.acoes) == 0:
+            self.explorar()
+
+        self.mapa.printMap()
 
     def playerConnected(self, player):
         ''' A player joined the server '''
@@ -182,16 +195,15 @@ class AIController:
                   "virar_esquerda",
                   "atacar")
 
+        print("acoes: " + str(self.acoes))
         if len(self.acoes) > 0:
             a = self.acoes.pop(0)
-            print("---> POP") # DEBUG
+            print("---> Pop " + action[a]) # DEBUG
+            print("acoes: " + str(self.acoes))
         else:
-            print("---> EXPLORAR")  # DEBUG
-            self.explorar()
-            if len(self.acoes) > 0:
-                a = self.acoes.pop(0)
-            else:
-                return ""  #uh nao sei o que fazer se nao tiver mais como explorar
+            #print("---> EXPLORAR")  # DEBUG
+            print("Sem acao") # DEBUG
+            return ""
 
         return action[a]
 

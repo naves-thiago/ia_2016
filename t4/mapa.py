@@ -1,3 +1,4 @@
+import sys
 class No:
     ''' Representa uma posicao para a qual podemos andar no mapa '''
     def __init__(self, x, y, tipo, custo=1):
@@ -25,13 +26,14 @@ class No:
             return False
 
 class TileType:
-    UNKNOWN   = 0
+    UNKNOWN  = 0
     GOLD     = 1
     POWEUP   = 2
     TELEPORT = 3
     PIT      = 4
     WALL     = 5
-    FREE     = 6
+    FREE     = 6 # Explorado
+    SAFE     = 7 # Desconhecido que nao tem perigo
 
 class Mapa:
     size = (59, 34)
@@ -91,7 +93,7 @@ class Mapa:
         if n.tipo == TileType.UNKNOWN and (not n in self.nburaco) and (not n in self.pburaco):
             self.pburaco.append(n)
 
-    def flagPteleport(self, n):
+    def flagPTeleport(self, n):
         # Se eu nao sei o que eh e nao sei q nao e teleport, marca
         # como possivel teleport se ja nao estiver marcado
         if n.tipo == TileType.UNKNOWN and (not n in self.nteleport) and (not n in self.pteleport):
@@ -120,3 +122,42 @@ class Mapa:
             self.pteleport.remove(n)
         except:
             pass
+
+    def flagSafe(self, n):
+        if n.tipo != TileType.UNKNOWN:
+            return
+
+        n.tipo = TileType.SAFE
+        try:
+            self.pburaco.remove(n)
+        except:
+            pass
+
+        try:
+            self.pteleport.remove(n)
+        except:
+            pass
+
+
+    def isSafe(self, n):
+        if n in self.pburaco or n in self.pteleport or n.tipo == TileType.WALL:
+            return False
+
+        return True
+
+
+    __str_tipo = {
+                   TileType.UNKNOWN  : "_",
+                   TileType.GOLD     : "G",
+                   TileType.POWEUP   : "U",
+                   TileType.TELEPORT : "T",
+                   TileType.PIT      : "P",
+                   TileType.WALL     : "W",
+                   TileType.FREE     : ".",
+                   TileType.SAFE     : "*"
+                 }
+    def printMap(self):
+        for y in self.mapa:
+            for x in y:
+                sys.stdout.write(Mapa.__str_tipo[x.tipo])
+            print("")
