@@ -9,7 +9,7 @@ class GameBot(threading.Thread):
         super().__init__()
         self.alive = threading.Event()
         self.alive.set()
-        self.interval = 1
+        self.interval = 0.5
         self.ai = AIController()
         self.game = HandleClient(self.__disconnectCB)
         self.game.setAIController(self.ai)
@@ -55,7 +55,10 @@ class GameBot(threading.Thread):
         ''' Ask AI for the next action '''
         a = self.ai.getDecision()
         print("Decision: "+a) # Debug / requisito
-        self.actions[a]()
+
+        f = self.actions.get(a)
+        if f:
+            f()
         self.game.sendRequestUserStatus()
         self.game.sendRequestObservation()
 

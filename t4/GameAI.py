@@ -1,6 +1,7 @@
+import pdb
 import random
 from a_star import A_star
-from mapa import Mapa
+from mapa import Mapa, TileType
 
 class Acoes:
     PEGAR    = 0
@@ -10,13 +11,22 @@ class Acoes:
     ESQUERDA = 4
     ATIRAR   = 5
 
+class Objetivos:
+    EXPLORAR  = 0
+    OURO      = 1
+    POWER_UP  = 2
+    A_ESTRELA = 3
+
 class AIController:
     def __init__(self):
         self.mapa = Mapa()
         self.gameState = "Disconnected"
         self.ultima_observacao = []
         self.time = 0
-        self.proxAcao = Acoes.FRENTE
+        self.acoes = [Acoes.FRENTE]
+        self.objetivo = Objetivos.EXPLORAR
+        #self.direction = 'U'
+        #self.pos = (3,3) # gambiarra (nao sabemos nossa pos na primeira iteracao)
 
     def gameStatus(self, status, time):
         ''' Game status was updated '''
@@ -54,8 +64,29 @@ class AIController:
 
         return self.mapa.get(p[0], p[1])
 
+    __convertePasso = {'F' : Acoes.FRENTE, 'R' : Acoes.DIREITA, 'L' : Acoes.ESQUERDA}
+    def explorar(self):
+        prox = self.nextPosition()
+        if prox and prox.tipo == TileType.UNKNOWN:
+            self.acoes = [Acoes.FRENTE]
+        else:
+            # A* para o desconhecido mais proximo
+            atual = self.mapa.get(self.pos[0], self.pos[1])
+            a = A_star(self.mapa.mapa, atual, self.direction, None)
+            seq = a.run() # Sequencia de passos
+
+            # Converte o formato da sequencia retornada pelo A*
+            self.acoes = []
+            for s in seq:
+                self.acoes.append(AIController.__convertePasso[s])
+
+        self.objetivo = Objetivos.EXPLORAR
+
     def observation(self, o):
         ''' Observation result '''
+
+        atual = self.mapa.get(self.pos[0], self.pos[1])
+        self.mapa.flagLivre(atual)
 
         self.ultima_observacao = o
 
@@ -63,9 +94,13 @@ class AIController:
             print("observation", obs) # Debug
 
             if obs == "blocked":
-                p = self.nextPosition()
-                n = self.mapa.get(p[0], p[1])
-                n.tipo = TileType.WALL
+                # Por agora considerando que so andamos para frente
+                n = self.nextPosition()
+                self.mapa.flagParede(n)
+
+                # Procura um novo caminho para o objetivo
+                # TODO testar qual eh o objetivo
+                self.explorar()
 
             elif obs == "steps":
                 pass
@@ -87,7 +122,7 @@ class AIController:
                 if not n in self.mapa.ouros:
                     self.mapa.ouros.append(n)
 
-                self.proxAcao = Acoes.PEGAR
+                self.acoes.insert(0, Acoes.PEGAR)
 
             elif obs == "redLight":
                 # Power-up
@@ -99,12 +134,12 @@ class AIController:
                 # Acao ?
 
             elif obs == "weakLight":
-                # Indefinido. (acho que nao tem)
+                # Indefinido. (nao tem)
                 pass
 
-            elif a[:5] == "enemy":
-                dist = int(a[6:])
-                self.proxAcao = Acoes.ATIRAR
+            elif obs[:5] == "enemy":
+                dist = int(obs[6:])
+                self.acoes.insert(0, Acoes.ATIRAR)
 
     def observationClean(self):
         ''' Observation result was nothing observated '''
@@ -147,5 +182,16 @@ class AIController:
                   "virar_esquerda",
                   "atacar")
 
-        return action[self.proxAcao]
+        if len(self.acoes) > 0:
+            a = self.acoes.pop(0)
+            print("---> POP") # DEBUG
+        else:
+            print("---> EXPLORAR")  # DEBUG
+            self.explorar()
+            if len(self.acoes) > 0:
+                a = self.acoes.pop(0)
+            else:
+                return ""  #uh nao sei o que fazer se nao tiver mais como explorar
+
+        return action[a]
 

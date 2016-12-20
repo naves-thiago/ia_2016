@@ -1,26 +1,26 @@
 import heapq
-from mapa import No
+from mapa import No, TileType
 
 class A_star:
     def _vizinhos(self, no):
         ''' Retorna a lista de vizinhos do No. Permite que um No desconhecido (tipo = '?')
             seja destino, mas nao permite passar por um desconhecido (nao retorna nenhum
             vizinho de um No desconhecido).'''
-        if no.tipo == "?":
+        if no.tipo == TileType.UNKNOWN:
             return []
 
         res = []
         x, y = no.pos
-        if x > 0 and (self.mapa[y][x-1].tipo == "." or self.mapa[y][x-1].tipo == "?"):
+        if x > 0 and (self.mapa[y][x-1].tipo == TileType.FREE or self.mapa[y][x-1].tipo == TileType.UNKNOWN):
             res.append(self.mapa[y][x-1])
 
-        if x < self.max_x and (self.mapa[y][x+1].tipo == "." or self.mapa[y][x+1].tipo == "?"):
+        if x < self.max_x and (self.mapa[y][x+1].tipo == TileType.FREE or self.mapa[y][x+1].tipo == TileType.UNKNOWN):
             res.append(self.mapa[y][x+1])
 
-        if y > 0 and (self.mapa[y-1][x].tipo == "." or self.mapa[y-1][x].tipo == "?"):
+        if y > 0 and (self.mapa[y-1][x].tipo == TileType.FREE or self.mapa[y-1][x].tipo == TileType.UNKNOWN):
             res.append(self.mapa[y-1][x])
 
-        if y < self.max_y and (self.mapa[y+1][x].tipo == "." or self.mapa[y+1][x].tipo == "?"):
+        if y < self.max_y and (self.mapa[y+1][x].tipo == TileType.FREE or self.mapa[y+1][x].tipo == TileType.UNKNOWN):
             res.append(self.mapa[y+1][x])
 
         return res
@@ -46,20 +46,48 @@ class A_star:
 
         return d
 
-    _dir_oposta = {'U' : 'D', 'D' : 'U', 'L' : 'R', 'R' : 'L'}
+    _num_rotacao = {"U":1, "R":2, "D":3, "L":4}
+    @staticmethod
+    def rotacoesHora(orig, dest, direcao):
+        ''' Calcula quantas rotacoes fazer para ir de orig para dest,
+            considerando que so podemos rodar em sentido horario.
+            rotacoes(orig, dest, direcao) -> numero de rotacoes. '''
+        #      1
+        #      ^
+        #      |
+        # 4 <--+--> 2
+        #      |
+        #     \/
+        #      3
+        #
+        # Atribuindo um dos numeros acima a cada direcao, podemos
+        # calcular o numero de rotacoes por (dest - orig + 4) % 4
+
+        o = A_star._num_rotacao[direcao]
+        d = A_star._num_rotacao[A_star.direcao(orig, dest)]
+
+        return (d - o + 4) % 4
+
     @staticmethod
     def rotacoes(orig, dest, direcao):
         ''' Calcula quantas rotacoes fazer para ir de orig para dest.
             direcao é a direção ('U', 'D', 'L', 'R') em orig.
             rotacoes(orig, dest, direcao) -> numero de rotacoes. '''
 
-        d = A_star.direcao(orig, dest)
-        if direcao == d:
-            return 0
-        elif direcao == _dir_oposta[d]:
-            return 2
-        else:
-            return 1
+        r = A_star.rotacoesHora(orig, dest, direcao)
+        if r == 3:
+            r = 1
+
+        return r
+
+    @staticmethod
+    def seqRotacoes(orig, dest, direcao):
+        ''' Calcula quais rotacoes fazer para ir de orig para dest.
+            direcao é a direção ('U', 'D', 'L', 'R') em orig.
+            rotacoes(orig, dest, direcao) -> tupla de rotacoes. '''
+
+        r = A_star.rotacoesHora(orig, dest, direcao)
+        return ((), ('R'), ('R', 'R'), ('L'))[r]  # 3 rotacoes a direita = 1 a esquerda
 
     def __init__(self, mapa, no_ini, dir_ini, no_fim):
         ''' Cria um buscador A*.
@@ -110,7 +138,57 @@ class A_star:
         return (atual, viz)
 
     def run(self):
-        ''' Executa todas as iteracoes da busca. '''
+        ''' Executa todas as iteracoes da busca e retorna a sequencia de acoes para ir
+        ate o destino. '''
         while self.step():
             pass
+
+        dest = self.no_fim
+        # Procurando um No nao visitado?
+        if self.no_fim == None:
+            dest = self.__findUnvisited()
+
+        # Nao tem pra onde ir...
+        if dest == None:
+            return None
+
+        return self.__stepsDest(dest)
+
+    def __findUnvisited(self):
+        # Encontra todos os nao visitados alcancaveis
+        candidatos = []
+        for y in self.mapa:
+            for x in y:
+                if x.tipo == TileType.UNKNOWN and x.custo_acumulado != None:
+                    candidatos.append(x)
+
+        # Econtra o No mais proximo entre os candidatos
+        if len(candidatos) == 0:
+            return None
+
+        melhor = candidatos[0]
+        for c in candidatos:
+            if c.custo_acumulado < melhor.custo_acumulado:
+                melhor = c
+
+        return melhor
+
+    def __stepsDest(self, dest):
+        ''' Retorna a sequencia de passos para chegar no No dest '''
+        pos   = [] # Sequencia de posicoes
+        steps = [] # Sequencia de acoes (vira, anda...)
+        a = dest
+        while a:
+            pos.insert(0, a)
+            if a == self.no_ini:
+                break
+            a = a.anterior
+
+        for i in range(len(pos)-1):
+            # Roda o numero de vezes necessario
+            steps.extend(A_star.seqRotacoes(pos[i], pos[i+1], pos[i].direcao))
+            steps.append("F") # Anda pra frente
+
+        return steps
+
 

@@ -25,7 +25,7 @@ class No:
             return False
 
 class TileType:
-    UNKOWN   = 0
+    UNKNOWN   = 0
     GOLD     = 1
     POWEUP   = 2
     TELEPORT = 3
@@ -39,7 +39,7 @@ class Mapa:
         ''' Cria um mapa vazio '''
         self.mapa = []
         for y in range(Mapa.size[1]):
-            l = [No(x, y, "?") for x in range(Mapa.size[0])]
+            l = [No(x, y, TileType.UNKNOWN) for x in range(Mapa.size[0])]
             self.mapa.append(l)
 
         self.ouros = []
@@ -103,7 +103,6 @@ class Mapa:
             self.pburaco.remove(n)
         except:
             pass
-
 
         try:
             self.pteleport.remove(n)
