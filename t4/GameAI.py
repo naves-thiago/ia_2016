@@ -73,7 +73,7 @@ class AIController:
         else:
             # A* para o desconhecido mais proximo
             atual = self.mapa.get(self.pos[0], self.pos[1])
-            a = A_star(self.mapa.mapa, atual, self.direction, None)
+            a = A_star(self.mapa, atual, self.direction, None)
             seq = a.run() # Sequencia de passos
 
             # Converte o formato da sequencia retornada pelo A*
@@ -104,12 +104,18 @@ class AIController:
                 if n:
                     self.mapa.flagParede(n)
 
+                if not "breeze" in o and not "flash" in o:
+                    adj = self.mapa.adjacentes(self.pos)
+                    for n in adj:
+                        self.mapa.flagSafe(n)
+
                 # Procura um novo caminho para o objetivo
                 # TODO testar qual eh o objetivo
                 self.explorar()
 
             elif obs == "steps":
-                pass
+                if len(o) == 1:
+                    self.observationClean()
 
             elif obs == "breeze":
                 adj = self.mapa.adjacentes(self.pos)
@@ -141,6 +147,11 @@ class AIController:
                 n.tipo = TileType.GOLD
                 if not n in self.mapa.ouros:
                     self.mapa.ouros.append(n)
+
+                if not "breeze" in o and not "flash" in o:
+                    adj = self.mapa.adjacentes(self.pos)
+                    for n in adj:
+                        self.mapa.flagSafe(n)
 
                 # Acao ?
 
@@ -223,6 +234,13 @@ class AIController:
 
         print("acoes: " + str(self.acoes))
         if len(self.acoes) > 0:
+            if self.acoes[0] == Acoes.FRENTE:
+                n = self.nextPosition()
+                if n and not self.mapa.isSafe(n):
+                    self.acoes = []
+                    print("Nao se mata xD")
+                    return ""
+
             a = self.acoes.pop(0)
             print("---> Pop " + action[a]) # DEBUG
             print("acoes: " + str(self.acoes))

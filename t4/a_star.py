@@ -7,22 +7,15 @@ class A_star:
         ''' Retorna a lista de vizinhos do No. Permite que um No desconhecido (tipo = '?')
             seja destino, mas nao permite passar por um desconhecido (nao retorna nenhum
             vizinho de um No desconhecido).'''
-        if no.tipo == TileType.UNKNOWN:
+        if no.tipo == TileType.UNKNOWN or not self.mapa_ctrl.isSafe(no):
             return []
 
         res = []
-        x, y = no.pos
-        if x > 0 and (self.mapa[y][x-1].tipo in (TileType.FREE, TileType.SAFE, TileType.GOLD, TileType.POWERUP)):
-            res.append(self.mapa[y][x-1])
 
-        if x < self.max_x and (self.mapa[y][x+1].tipo in (TileType.FREE, TileType.SAFE, TileType.GOLD, TileType.POWERUP)):
-            res.append(self.mapa[y][x+1])
-
-        if y > 0 and (self.mapa[y-1][x].tipo == TileType.FREE in (TileType.FREE, TileType.SAFE, TileType.GOLD, TileType.POWERUP)):
-            res.append(self.mapa[y-1][x])
-
-        if y < self.max_y and (self.mapa[y+1][x].tipo == TileType.FREE in (TileType.FREE, TileType.SAFE, TileType.GOLD, TileType.POWERUP)):
-            res.append(self.mapa[y+1][x])
+        adj = self.mapa_ctrl.adjacentes(no)
+        for n in adj:
+            if self.mapa_ctrl.isSafe(n):
+                res.append(n)
 
         return res
 
@@ -94,9 +87,12 @@ class A_star:
     def __init__(self, mapa, no_ini, dir_ini, no_fim):
         ''' Cria um buscador A*.
             A_star(mapa, no inicial, direcao inicial, no final) -> Buscador A*. '''
-        self.mapa      = mapa
-        self.max_x     = len(mapa[0])-1
-        self.max_y     = len(mapa)-1
+        self.mapa_ctrl = mapa
+        self.mapa      = mapa.mapa
+        #self.max_x     = len(mapa[0])-1
+        #self.max_y     = len(mapa)-1
+        self.max_x     = mapa.size[0] -1
+        self.max_y     = mapa.size[1] -1
         self.no_ini    = no_ini
         self.no_fim    = no_fim
         no_ini.direcao = dir_ini

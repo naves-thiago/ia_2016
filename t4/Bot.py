@@ -9,7 +9,7 @@ class GameBot(threading.Thread):
         super().__init__()
         self.alive = threading.Event()
         self.alive.set()
-        self.interval = 0.3
+        self.interval = 0.1
         self.ai = AIController()
         self.game = HandleClient(self.__disconnectCB)
         self.game.setAIController(self.ai)
