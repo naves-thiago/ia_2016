@@ -128,7 +128,7 @@ class Mapa:
         if n.tipo != TileType.UNKNOWN:
             return
 
-        #n.tipo = TileType.SAFE
+        n.tipo = TileType.SAFE
         #try:
         #    self.pburaco.remove(n)
         #except:
